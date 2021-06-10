@@ -656,11 +656,70 @@ const vm = new Vue({
 
 ###### 3.作用域插槽: v-slot(slot-scope已被废弃)
 
-- 父组件改变子组件数据的渲染形式，即内容仍为子组件的内容，但是由父组件来决定如何渲染
-
 - 编译作用域：父组件模板的所有东西都会在父级作用域内编译，子组件模板的所有东西都会在子级作用域内编译，子组件中的变量不会去父级作用域查找，即父在父,子在子
 
-  ​    
+- 父组件改变子组件数据的渲染形式，即内容仍为子组件的内容，但是由父组件来决定如何渲染，为了在父组件中使用子组件所属的数据，父组件中添加“v-slot='临时变量名'”属性,临时变量将保存子组件中的slot中的数据，这样父组件中就可随意渲染普通的子slot绑定时的数据
+
+- ```vue
+  // 父组件  将子组件引入并注册后
+  <template>
+    <div class="parent">
+    	<son v-slot="title">
+        	<h1>父元素通过v-slot拿到了子组件插槽时绑定的title(也就是ti)数据</h1>
+        	<h2>{{title.name}}</h2> // firstName
+    	</son>
+    </div>
+  </template>
+  ```
+  
+   
+  
+  ```vue
+  // 子组件
+  <template>
+    <div class="son">
+      <slot :title="ti"></slot> // 匿名插槽
+    </div>
+  </template>
+  
+  <script>
+    export default {
+      data() {
+        return {
+          ti: {
+            name: 'firstName'
+          }
+        }
+      }
+    }
+  </script>		
+  ```
+  
+  
+
+##### 第11节: 生命周期   
+
+1. 生命周期图示
+
+    <img src="imgs/vueImg/vue生命周期.png" alt="vue生命周期" style="zoom: 33%;" />
+
+2. 主要生命周期分类
+
+    - 创建期间的生命周期函数：
+        - beforeCreate：实例刚在内存中被创建,此时未初始化data和methods属性
+        - created：实例已在内存中被创建好,data和methods也被初始化,但模板还未被编译
+        - beforeMount：模板已完成编译但还未被挂载到页面中
+        - mounted：模板已编译好并被挂载到页面指定容器中显示
+
+    - 运行期间的生命周期函数：
+        - beforeUpdate：状态更新之前执行此函数，此时data值是最新的，但是界面上的数据是旧的，因为此时还未开始重新渲染DOM节点
+        - updated：实例更新完毕后调用此函数，此时data和界面上的数据都已完成更新，页面也重新被渲染
+
+    - 销毁期间的生命周期函数：
+        - beforeDestory：实例销毁之前调用，在这一步实例仍可完全调用
+        - destoryed：实例销毁后调用，函数调用后，vue实例指示的所有东西都会解绑，所有事件监听器会被移除，所有的子实例也会被销毁
+
+
 
 
 
@@ -1044,7 +1103,19 @@ const vm = new Vue({
     -  函数名称和小括号之间不带空格,但ESLint要求带,将此要求禁用掉:
         - 在ESLint配置文件“.eslintrc.js”中的rules中添加“'space-before-function-paren':0”
 
+7. vue-lazyload
 
+    - 图片懒加载插件
+
+    - 具体安装使用流程
+
+        - 安装vue-lazyload插件
+
+        - main.js文件引入“import VueLazyload from 'vue-lazyload'”
+        - 并使用“'Vue use(VueLazyload,{可选参数})'”
+            - 可选参数示例: “loading:require('占位图片地址')” 即当图片未加载出时显示此张图片
+
+        - 将原来图片属性“:src='XXX'”改为“v-lazy='XXX'”
 
 ------
 
@@ -1122,7 +1193,7 @@ const vm = new Vue({
     
 
 
-  
+
 
 ------
 
@@ -1479,6 +1550,8 @@ const vm = new Vue({
 
 3. 组件使用时只需“this.$store.commit('方法名'，[实参])”  注：需commit方法而非拿到store对象直接调用方法,store状态的更新唯一方式就是提交Mutation
 
+4. mutations中的方法也接收默认参数state及形参
+
     - ```javascript
         methods: {
           submitAdd() {
@@ -1515,7 +1588,7 @@ const vm = new Vue({
         }
         ```
 
-4. 常量类型
+5. 常量类型
 
     - 在mutations中定义了很多事件类型,即方法名称，当方法较多时若methods中提交的方法名称和mutations定义的方法名称不一致时就会报错,因此定义一个常量统一一下
 
@@ -1544,7 +1617,162 @@ const vm = new Vue({
         //  实质就是可随意定义一个字符串作为中间值，mutations和methods两个文件中的常量指向同一个字符串,因此字符串可随意写,即使写错也无妨,只要保证两个文件中常量名称一样即可
         ```
 
-        
+
+
+
+##### 第6节:vuex-actions
+
+1. 作用也类似于methods，同步方法在mutations中执行，异步在actions中执行
+
+2. 注意第二节的流程图，调用actions中的方法的写法为“this.$store.dispatch('reduce',[data])”
+
+3. 在actions中定义的方法也接受两个参数context和形参，但需注意：
+
+    - 若未使用“module”，此时**context**为整个**store对象**，
+    - 如果使用了“module”，此时**context**为属于自己module里的**store对象**
+    - 未简化写法可使用解构赋值，取出必要的属性，如“{state,mutations}”来代替context
+
+4. 注意:
+
+    - 如果是同步方法,组件直接commit “mutations”中的方法即可
+    - 如果是异步方法，流程如下：组件dispatch“actions中的方法” --> actions中的方法commit"mutations中的异步方法" --> mutations写具体方法
+
+5. 
+
+    ```javascript
+    methods: {
+      submit() {
+        this.$store.dispatch('add',123)
+      }
+    }
+    /*--------------------------------------------*/
+    import Vue from 'vue'
+    import Vuex from 'vuex'
+    Vue.use(Vuex)
+    const store = new Vuex.Store({
+      state: {
+        num: 1,
+      },
+      mutations: {
+        addStr(state,payLoad) {
+          console.log(state.num) // 2
+          console.log(payLoad) 	// 123
+        }
+      },
+      actions: {  
+        add(context, payLoad) {
+          context.state.num = 2;
+          context.commit('addStr', payLoad)
+        }
+      }
+    })
+    export default store // 注意导出后在main.js文件中引入并挂载到实例上
+    ```
+
+
+
+##### 第7节:vuex-modules
+
+1. 如果有多个状态可进行抽离
+
+    ```javascript
+    const moduleA = {
+      state: {
+        num: 1,
+      },
+      getters: {},
+      mutations: {
+        addA() {
+          console.log('A和B中的方法不能重名')
+        }
+      }
+    }
+    const moduleB = {
+      state: {
+        num: 2,
+      },
+      getters: {},
+      mutations: {
+        addB() {
+           console.log('A和B中的方法不能重名')
+        }
+      }
+    }
+    
+    ```
+
+    ```javascript
+    import Vue from 'vue'
+    import Vuex from 'vuex'
+    import moduleA from '......' 	// 根据导出方式引入A和B
+    import moduleB from '......'
+    Vue.use(Vuex)
+    const store = new Vuex.Store({
+      state: {},
+      getters: {},
+      modules: {
+        moduleA,moduleB
+      }
+    })
+    ```
+
+    ```javascript
+    // 用法
+    // state的用法比较特殊,且每个模块的state中的值不会进行合并： this.$store.moduleName.state.key
+    // moduleA和B中mutations与mutations中的方法名不能重名，因为会进行合并，getters、actions同mutations
+    methods: {
+      add() {
+        console.log(this.$store.moduleA.state.num) 	// 1 
+        console.log(this.$store.moduleA.state.num) 	// 2
+        this.$store.commit('addA')
+      }
+    }
+    ```
+
+    
+
+##### 第8节：mapGetters
+
+1. vue封装好的内部使用辅助函数，将vuex中的getters函数进行映射，需要单个vue文件引入即可
+
+2. getters映射到computed中，而actions、mutations同样也可映射,用法都相同,只需将其映射到methods中（映射前要引入函数）
+
+3. 用法：
+
+    ```javascript
+    // vuex文件
+    getters: {
+      addOne() {
+        return 123;
+      },
+       addTwo() {
+        return 456;
+      }
+    }
+    ```
+
+    ```javascript
+    // 单个vue文件
+    {{addA}} 		// 123
+    {addB}			// 456
+    // {{addOne}}		// 123
+    // {{addTwo}}		// 456
+    /*----------------------------------------------*/
+    import { mapGetters } from 'vuex'
+    computed： {
+    	...mapGetters({  // 解构
+        addA: 'addOne',
+        addB: 'addTwo'
+      }) 		// 写法1,
+      // ...mapGetters(['addOne','addTwo'])  		// 写法2
+    }
+    ```
+
+    
+
+
+
+
 
 ------
 
@@ -1743,7 +1971,7 @@ const vm = new Vue({
 ##### 第7节：其他网络相关
 
 	1. 跨域使用token的方式维持状态
- 	2. 不跨域则使用cookie在客户端或session在服务器端记录状态
+	2. 不跨域则使用cookie在客户端或session在服务器端记录状态
 
 3. 登录-token原理分析:
     -  登录页面输入用户名和密码经过服务器验证后会生成该用户的token并返回,客户端存储token,后续所有的请求都携带该token发送请求,服务器验证token是否通过

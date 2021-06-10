@@ -97,7 +97,7 @@ function formateDate(date, fmt) {
 
 
 
-##### 4.混入mixins
+##### 4. 混入mixins
 
 - 其实就是将相同的生命周期函数,methods方法、data数据等抽离到一个js文件中,哪个组件需要引入即可
 
@@ -121,7 +121,7 @@ function formateDate(date, fmt) {
 
     
 
-##### 5.runtime-only 和 runtime+compiler 的区别
+##### 5. runtime-only 和 runtime+compiler 
 
 1. 先看vue程序运行过程
 
@@ -164,4 +164,82 @@ function formateDate(date, fmt) {
         ```
 
         
+
+##### 6. 响应式原理
+
+- 清楚两点即可知道原理
+    - vue内部是如何监听数据发生改变的 （通过数据劫持）
+    - vue是如何通知哪些组件数据已变化，视图需及时刷新 （通过发布者订阅者模式）
+
+- 数据劫持
+
+    - **Object.defineProperty**的方法里面的setter 与getter方法的**观察者模式**
+
+    ```javascript
+    const obj = {
+        name: 'coder',
+        age: 18,
+      }
+    // 数据劫持
+    Object.keys(obj).forEach(key => {
+      let value = obj[key];
+      Object.defineProperty(obj,key,{
+        set(newValue) {
+          console.log('监听' + key + '值改变');
+          value = newValue;
+          console.log(value);
+          // 在此处调用发布者模式 dep.notify() 具体看下段代码
+        },
+        get() {
+          // get收集依赖
+          console.log('获取' + key + '值改变');
+          return value      
+        }
+      })
+    })
+    obj.name  //会触发get()
+    obj.name = 'kobe'  // 触发set()
+    ```
+
+    
+
+- 发布订阅者模式
+
+    ```javascript
+    // 发布者
+    class Dep {
+      constructor() {
+        this.subs = []; // 将所有订阅者汇总到一个数组里
+      }
+      addSubs(watcher) {
+        this.subs.push(watcher)  // 收集所有订阅者信息
+      }
+      notify() {
+        this.subs.forEach(item => item.update()) // 通知所有订阅者数据进行了更新，让订阅者去做数据更新后自己的事
+      }
+    }
+    
+    // 订阅者
+    class Watcher {
+      constructor(name) {
+        this.name = name  // 实例化每一个订阅者,记录订阅者信息
+      }
+      update() {
+        console.log(this.name + '发生了update')  // 每个订阅者根据数据做自己的事情
+      }
+    }
+    
+    const dep = new Dep();
+    
+    const w1 = new Watcher('张三'); 	// 实例化对象
+    dep.addSubs(w1) // 对象去订阅者哪里登记
+    const w2 = new Watcher('李四')
+    dep.addSubs(w2)
+    
+    dep.notify() 	// 发布者调用方法一次通知所有订阅者
+    ```
+
+    
+
+<img src="imgs/vueImg/vue响应式原理.png" alt="vue响应式原理"  />
 
