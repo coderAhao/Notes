@@ -9,25 +9,25 @@
 ```javascript
 // 写法1: 使用箭头函数的this
 function debounce(func,wait) {
-		let timeout;
-		return function (...args) {
-  			if(timeout) clearTimeout(timeout);
-  			timeout = setTimeout(() => {
-		   		 func.apply(this,args)
-  			},wait)
-		}
+  let timeout;
+  return function (...args) {
+    if(timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func.apply(this,args)
+    },wait)
+  }
 }
 // 写法2: 使用普通函数的this
 function debounce(func,wait) {
-  	let timeout;
-  	return function () {
-    		let content = this;
-    		let args = arguments;
-    		if(timeout) clearTimeout(timeout);
-    		timeout = setTimeout(function() {
-      			func.apply(content,args)
-    		},wait)
-  	}
+  let timeout;
+  return function () {
+    let content = this;
+    let args = arguments;
+    if(timeout) clearTimeout(timeout);
+      timeout = setTimeout(function() {
+        func.apply(content,args)
+    },wait)
+  }
 }
 function fu() {
   // doSomeThing
@@ -49,49 +49,51 @@ str();
 ```javascript
 // 简单版
 function dateFormat(dateVal) {
-		const dt = new Date(dateVal * 1000);
-		const y = dt.getFullYear();
-		const m = (dt.getMonth() + 1 + '').padStart(2, '0');
-		const d = (dt.getDate() + '').padStart(2, '0');
-		const hh = (dt.getHours() + '').padStart(2, '0');
-		const mm = (dt.getMinutes() + '').padStart(2, '0');
-		const ss = (dt.getSeconds() + '').padStart(2, '0');
-		return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
+  const dt = new Date(dateVal * 1000);
+  const y = dt.getFullYear();
+  const m = (dt.getMonth() + 1 + '').padStart(2, '0');
+  const d = (dt.getDate() + '').padStart(2, '0');
+  const hh = (dt.getHours() + '').padStart(2, '0');
+  const mm = (dt.getMinutes() + '').padStart(2, '0');
+  const ss = (dt.getSeconds() + '').padStart(2, '0');
+  return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
 }
 ```
+
+
 
 ```javascript
 //  一劳永逸版
 // fmt格式: “yyyy-MM-dd hh:mm:ss” 也可以有其他格式但字母不得改变 
 
 function formateDate(date, fmt) {
-  	date = new Date(date * 1000); // 时间戳是秒但Date函数的参数需为毫秒
- 		 if (/(y+)/.test(fmt)) {
-    		fmt = fmt.replace(RegExp.$1,(date.getFullYear() + '').substr(4 - RegExp.$1.length));
- 		 }
-  // 单独将年提取出来,因为年份是4个字,但传过来的字数为1/2/3/4个都可以
-  // “/(y+)/” 即看传过来的有几个y
-  // “RegExp.$1” 即将匹配到的第一个子字符串“y+”保存起来 (可百度RegExp.$1的含义)
-  // “date.getFullYear() + ''” 将年由数字转为字符串(也可使用“string”方法转)
-  // “substr(4 - RegExp.$1.length)” 根据传来的格式判断年份需要几位(如2019 --> 19)
-  // “fmt.replace()” 将截取好的年份进行替换
+  date = new Date(date * 1000); // 时间戳是秒但Date函数的参数需为毫秒
+  if (/(y+)/.test(fmt)) {
+    fmt = fmt.replace(RegExp.$1,(date.getFullYear() + '').substr(4 - RegExp.$1.length));
+  }
+// 单独将年提取出来,因为年份是4个字,但传过来的字数为1/2/3/4个都可以
+// “/(y+)/” 即看传过来的有几个y
+// “RegExp.$1” 即将匹配到的第一个子字符串“y+”保存起来 (可百度RegExp.$1的含义)
+// “date.getFullYear() + ''” 将年由数字转为字符串(也可使用“string”方法转)
+// “substr(4 - RegExp.$1.length)” 根据传来的格式判断年份需要几位(如2019 --> 19)
+// “fmt.replace()” 将截取好的年份进行替换
 
- 			let o = {
-          'M+': date.getMonth() + 1,
-          'd+': date.getDate(),
-          'h+': date.getHours(),
-          'm+': date.getMinutes(),
-          's+': date.getSeconds(),
-       }
-       for (let k in o) {
-          if (new RegExp(`(${k})`).test(fmt)) {
-            let str = o[k] + '';
-            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length !== 1) ? str : str.padStart(2,'0'))
-          }
-        }
-		  // 判断“月日时分秒”是否传过来，如果传过来则再进行补零操作
+  let o = {
+    'M+': date.getMonth() + 1,
+    'd+': date.getDate(),
+    'h+': date.getHours(),
+    'm+': date.getMinutes(),
+    's+': date.getSeconds(),
+  }
+  for (let k in o) {
+    if (new RegExp(`(${k})`).test(fmt)) {
+      let str = o[k] + '';
+      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length !== 1) ? str : str.padStart(2,'0'))
+    }
+  }
+// 判断“月日时分秒”是否传过来，如果传过来则再进行补零操作
 
-  		return fmt;
+  return fmt;
 }
 ```
 
@@ -104,19 +106,19 @@ function formateDate(date, fmt) {
     ```javascript
     // 抽离js文件写法:
     export const funName = {
-     		data() {
-      			return {
-       					data1: ''
-      			}
-     		},
-     		mounted() {
-      		fun() {
-      		}
-     		}
+      data() {
+        return {
+          data1: ''
+        }
+      },
+      mounted() {
+        fun() {
+        }
+      }
     }
     // 组件引用时：
-     import {funName} from '...'  	// 1.先从JS文件中引入方法
-    mixins:[funName]		// 2.和data、methods等同级别创建mixins数组放置引入的数据
+    import {funName} from '...'	// 1.先从JS文件中引入方法
+    mixins:[funName]	// 2.和data、methods等同级别创建mixins数组放置引入的数据
     ```
 
     
@@ -157,10 +159,10 @@ function formateDate(date, fmt) {
         ```javascript
         //  render的箭头函数还原
         render: function (createElement) {
-            return createElement(App);
+           return createElement(App);
         }
         // createElement函数可接受组件，也可自行创建标签， 具体用法查看原生JS
-        /render函数创建的元素会直接将页面中el指定的容器替换掉
+        //render函数创建的元素会直接将页面中el指定的容器替换掉
         ```
 
         
@@ -177,9 +179,9 @@ function formateDate(date, fmt) {
 
     ```javascript
     const obj = {
-        name: 'coder',
-        age: 18,
-      }
+      name: 'coder',
+      age: 18,
+    }
     // 数据劫持
     Object.keys(obj).forEach(key => {
       let value = obj[key];
@@ -192,8 +194,8 @@ function formateDate(date, fmt) {
         },
         get() {
           // get收集依赖
-          console.log('获取' + key + '值改变');
-          return value      
+        console.log('获取' + key + '值改变');
+        return value      
         }
       })
     })

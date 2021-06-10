@@ -258,9 +258,9 @@
 
         - ```javascript
             let arr = [1, 3, 7, 5, 8];
-            for(let i =1; i < arr.length; ++i) { 									// 控制需要比较的轮数
-              for(let j = 0; j < arr.length - i; ++i) {					 // 控制参与比较的元素
-                if (arr[j] > arr[j + 1]) {															// 比较相邻的两个元素
+            for(let i =1; i < arr.length; ++i) {	// 控制需要比较的轮数
+              for(let j = 0; j < arr.length - i; ++i) {	// 控制参与比较的元素
+                if (arr[j] > arr[j + 1]) {	// 比较相邻的两个元素
                   [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]]
                 }
               }
@@ -279,9 +279,9 @@
 
         - ```javascript
             let arr = [1, 3, 7, 5, 8];
-            for(let i = 1; i < arr.length; ++i) { 							// 遍历无序数组下标
-              for(let j = i; j > 0 ; --j) {					 									 // 遍历并比较一个无序数组元素与所有有序数组元素
-                if (arr[j - 1] > arr[j]) {															// 比较相邻的两个元素
+            for(let i = 1; i < arr.length; ++i) {	// 遍历无序数组下标
+              for(let j = i; j > 0 ; --j) {	// 遍历并比较一个无序数组元素与所有有序数组元素
+                if (arr[j - 1] > arr[j]) {	// 比较相邻的两个元素
                   [arr[j - 1], arr[j]] = [arr[j], arr[j - 1]]
                 }
               }
@@ -640,13 +640,13 @@
     
         ```javascript
         function fun() {
-            let a = 10;
-            return function fn() {
-              console.log(a);
-            }
+          let a = 10;
+          return function fn() {
+            console.log(a);
           }
-          let f = fun(); // 此时 f=fn(){console.log(a)}
-          f(); // 10   另:由于形成了闭包,函数f若不调用则a会一直存在不被销毁
+        }
+        let f = fun(); // 此时 f=fn(){console.log(a)}
+        f(); // 10   另:由于形成了闭包,函数f若不调用则a会一直存在不被销毁
         
         // 外部要想访问到a,访问方式：1.fun()()  2.var str=fun(); str()
         // 方式1每次调用fun时会执行函数里的所有内容,从上到下依次执行,即a每次都会初始化 
@@ -660,9 +660,9 @@
           let a=100;
           console.log('调用一次弹一次');
           return function(){
-        		a++;
-         		console.log(a);
-           }
+            a++;
+            console.log(a);
+          }
         }
         fun()(); 	// 101
         fun()(); 	// 101
@@ -670,12 +670,12 @@
         /*------------------------------------------------*/
           // 方式2:
         function fun() {
-           let a=100;
-           console.log('只弹一次');
-           return function(){
-        			a++;
-        			console.log(a);
-           }
+          let a=100;
+          console.log('只弹一次');
+          return function(){
+            a++;
+            console.log(a);
+          }
         }
         let b=fun(); // 此时函数fun已运行,a已被初始化且由于return此时b=function(){a++;console.log(a);}
         b(); //101
@@ -692,13 +692,13 @@
 
     ```javascript
     function fun() {
-    	var arr=[];
+      var arr=[];
       for(var i=0; i<5; i++) {
-    		arr[i] = function() {
-    			return '元素' + i;
-    		}
-    	}
-    	return arr;
+        arr[i] = function() {
+          return '元素' + i;
+        }
+      }
+      return arr;
     }
     var bn = fun();
     console.log(bn); // 5个函数
@@ -712,11 +712,11 @@
     function fun() {
       var arr = [];
       for(var i = 0; i < 5; i++) {
-    		arr[i] = function() {
-    			return '元素'+i;
-    		}();
-    	}
-    	return arr;
+        arr[i] = function() {
+          return '元素'+i;
+        }();
+      }
+      return arr;
     }
     var bn = fun();
     console.log(bn); // 此时会得到数组“元素0-4”
@@ -730,14 +730,14 @@
     ```javascript
     // 1. 不传参不立即执行
     function fun(){
-       var arr = [];
-       for(var i = 0; i < 5; i++){
-    			arr[i] = function() {
-     				return function(){
-      				return '元素'+i;
-     				}
-    			}
-     	}
+      var arr = [];
+      for(var i = 0; i < 5; i++){
+        arr[i] = function() {
+          return function(){
+            return '元素'+i;
+          }
+        }
+      }
       return arr;
     }
     var bn=fun();
@@ -751,18 +751,18 @@
     function fun(){
       var arr=[];
       for(var i = 0; i < 5; i++){
-     		arr[i] = function(n) {
-    			return function() {
-    				return '元素'+n;
-    			}
-    		}(i);
-     	}
+        arr[i] = function(n) {
+          return function() {
+            return '元素'+n;
+          }
+        }(i);
+      }
       return arr;
     }
     var bn = fun();
     for(var i=0; i < 5; i++){
-       console.log(bn[i]); // “function(){return '元素'+i}”
-       console.log(bn[i]()) // 数组“元素0-4”
+      console.log(bn[i]); // “function(){return '元素'+i}”
+      console.log(bn[i]()) // 数组“元素0-4”
     }
     // 注意:此时的“n”只是一个形参 在“i”传参并立即执行时,由于函数按值传递,第一次循环时“i”为0,拷贝0赋值给形参“n”,第二次循环时“i”为1,拷贝1赋值给形参“n”,即在每次调用匿名函数时都会传入变量“i”,并将变量“i”的当前值传给形参“n”,即每次调用匿名函数都会在其内部创建一个局部变量“n”并赋值,这就是闭包可将局部变量保存在内存中
     ```
@@ -780,13 +780,13 @@
         ```javascript
         var name='window';
         var obj={
-           name:'myobj',
-           get: function() {
-          		// 若在此处添加this 则this作用域在匿名函数内 this指向obj 因为匿名函数是obj的对象
-          		return function(){
-           			return this.name; //此处this的作用域仅在闭包内 指向get 因为是get的方法 
-          		}
-           }
+          name:'myobj',
+          get: function() {
+            // 若在此处添加this 则this作用域在匿名函数内 this指向obj 因为匿名函数是obj的对象
+            return function(){
+              return this.name; //此处this的作用域仅在闭包内 指向get 因为是get的方法 
+            }
+          }
         }
         console.log(obj.get()()) // 结果为“window”
         console.log(obj.get().call(obj)) // 结果为“myobj” call()即将闭包函数中的this指向obj
@@ -851,8 +851,8 @@
         ```javascript
         function people(){
         	var name = '张三';
-        	this.getName=function(){
-        		return name;
+          this.getName=function(){
+            return name;
         	}
         }
         var p1 = new people();   // 注意需用new 
@@ -869,20 +869,20 @@
         - 定义构造函数或特权方法
 
         ```javascript
-        (function() {             			   // 创建私有作用域 
-        		var name = '张三';     		// 定义私有变量
-        		User = function(){};  	// 定义构造函数 注意此时User为全局变量 
-        		User.prototype.getName = function(){
-        				return name;
-        			}
-        		User.prototype.setName = function(value){
-        				name = value
-        			}
+        (function() {	// 创建私有作用域 
+          var name = '张三';	// 定义私有变量
+          User = function(){};	// 定义构造函数 注意此时User为全局变量 
+          User.prototype.getName = function(){
+            return name;
+          }
+          User.prototype.setName = function(value){
+            name = value
+          }
         })()
         var p1 = new User();
-        console.log(p1.getName());  	// “张三” 
+        console.log(p1.getName());	// “张三” 
         p1.setName('李四');
-        console.log(p1.getName());  	// “李四” 
+        console.log(p1.getName());	// “李四” 
         ```
 
         
@@ -925,7 +925,7 @@
 
         ```javascript
         function cal(num1,num2,fn) {
-        		return fn(num1,num2);
+        	return fn(num1,num2);
         }
         console.log(
           cal(45,55,function (a,b) {
@@ -966,7 +966,7 @@
         // 典型的递归函数: 阶乘
         function fun(n) {
           if (n == 1) {
-          		return 1; 	//递归出口
+          	return 1; 	//递归出口
           }
           return n * fun(n-1);
         }
@@ -1081,13 +1081,13 @@
 
     - ```javascript
         function create(name,weapon) {
-        		var per = new Object();
-        		per.na = name;
-        		per.wea = weapon;
-        		per.run = function () {
-        				return this.na + '的武器是' + this.wea;
-        		}
-        		return per;  	// 此步看做出厂,必须有
+        	var per = new Object();
+        	per.na = name;
+        	per.wea = weapon;
+        	per.run = function () {
+        		return this.na + '的武器是' + this.wea;
+        	}
+        	return per;  	// 此步看做出厂,必须有
         }
         var p1 = create('孙悟空','金箍棒');
         console.log(p1.run()); 	//“孙悟空的武器是金箍棒”

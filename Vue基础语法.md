@@ -189,9 +189,9 @@
   - 值绑定(:value):一般input中的value不写死,故需动态绑定(此知识点是对checkbox和select的优化)
 
   ```html
-   <label v-for="item in items" :for="item">
-  			<input type="checkbox" :value="item" :id="item" v-model="hobbies">
-   </label>
+  <label v-for="item in items" :for="item">
+    <input type="checkbox" :value="item" :id="item" v-model="hobbies">
+  </label>
   ```
 
   ```javascript
@@ -236,14 +236,14 @@
 
 ```javascript
 computed:{
-   str:{
-      set: function(value) {
-    			console.log(value*2)
-   		 }
-    	get: function() {
-    			console.log("example")
-   			}
- 		}
+  str: {
+    set: function(value) {
+      console.log(value * 2)
+    }
+    get: function() {
+      console.log("example")
+    }
+  }
   // 使用set时可直接“vm.str=x”此时形参value等于x
   // 若只有一个属性则可直接简写为str(){...}
 }
@@ -371,15 +371,15 @@ computed:{
 
 - ```javascript
     const son=Vue.extend({
-    	 template:
-      		` <div><h2>这是子组件</h2></div> `
-       })
-     const par=Vue.extend({
-    		template:
-       		`<div><h2>这是父组件,下面是调用的子组件</h2></div>`,
-    		components:{cpnson:son},
-       })
-       Vue.component('cpnpar',par)
+      template:
+      	` <div><h2>这是子组件</h2></div> `
+    })
+    const par=Vue.extend({
+      template:
+      	`<div><h2>这是父组件,下面是调用的子组件</h2></div>`,
+      	components:{cpnson:son},
+    })
+    Vue.component('cpnpar',par)
     ```
 
     
@@ -398,26 +398,27 @@ computed:{
     - 组件的目的就是为了进行复用,当组件复用时,组件内的data数据也应跟随模板一块复用,若data内直接写为对象,相当于把data直接挂载到这个组件的原型上了,所有复用的组件共用一个data， 当别的地方复用组件并修改组件内的数据时,其他地方复用的组件也会受到影响，因此data应跟随组件进行深拷贝，这样每复用一次组件，就会返回一份新的data
 
 - ```javascript
-    function Box(){
-      };
-     Box.prototype.data={
-         msg:"aaa"
-     };
-     let b1=new Box();
-     let b2=new Box();
-     b1.data.msg="bbb"; //这里修改一个实例的属性，会造成另一个实例的属性也跟着修改了
-     console.log(b1.data.msg);	// bbb
-     console.log(b2.data.msg);	// bbb
+    function Box(){};
+    Box.prototype.data = {
+      msg:"aaa"
+    };
+    let b1=new Box();
+    let b2=new Box();
+    b1.data.msg = "bbb"; //这里修改一个实例的属性，会造成另一个实例的属性也跟着修改了
+    console.log(b1.data.msg);	// bbb
+    console.log(b2.data.msg);	// bbb
     ```
-
+    
+    
+    
     ```javascript
-    function Box(){
-         this.data=this.data();
-     }
-    Box.prototype.data=function(){
-       return {
-           msg:"aaa"
-        }
+    function Box() {
+      this.data = this.data();
+    }
+    Box.prototype.data = function() {
+      return {
+        msg:"aaa"
+      }
     };
     var b1=new Box();
     var b2=new Box();
@@ -425,7 +426,7 @@ computed:{
     console.log(b1.data.msg);	// bbb
     console.log(b2.data.msg);	// aaa
     ```
-
+    
     
 
 ##### 第5节: 父组件通过props属性向子组件传值
@@ -445,20 +446,20 @@ computed:{
 
     ```javascript
     props: {
-    		str1: Number, 	// 绑定传入的值需为number型
-        str2: [Number,string], // 绑定传入的值需为number或string型
-        str3: {
-         	 type:Number,
-       		 default:100, 	// 绑定类型的同时为其指定默认值
-        	 required:true,	 // 模板标签内必须绑定变量进行传值引用
-        }, 
-        str4: {
-        	 type:Object,
-         	 default() {return {} }  // 默认值也可为函数
-        },
-        str5: {
-         		type:Array,
-         		default() {return [] }  // 默认值也可为数组
+      str1: Number, 	// 绑定传入的值需为number型
+      str2: [Number,string], // 绑定传入的值需为number或string型
+      str3: {
+        type:Number,
+        default:100, 	// 绑定类型的同时为其指定默认值
+        required:true,	 // 模板标签内必须绑定变量进行传值引用
+      }, 
+      str4: {
+        type:Object,
+        default() {return {} }  // 默认值也可为函数
+      },
+      str5: {
+        type:Array,
+          default() {return [] }  // 默认值也可为数组
         }
     }
     ```
@@ -480,28 +481,30 @@ computed:{
 
 ```html
 <div id="app">
-     <son-cpn :son-mes='parMes'></son-cpn>
- </div>
- <template id="sonCpn">
-     <div>
-        <h2>{{sonMes}}</h2> 
-     </div>
-  </template>
+  <son-cpn :son-mes='parMes'></son-cpn>
+</div>
+<template id="sonCpn">
+  <div>
+    <h2>{{sonMes}}</h2> 
+  </div>
+</template>
 ```
+
+
 
 ```javascript
 Vue.component('parentCpn',{
-     template:"#sonCpn",
-     props:{
-        sonMes: '',
-      }
-   })
+  template:"#sonCpn",
+  props: {
+    sonMes: '',
+  }
+})
 const vm = new Vue({
-      el: "#app",
-      data: {
-          parMes:"这是父组件中的数据，sonMes接收"
-       }
- }) 
+  el: "#app",
+  data: {
+    parMes:"这是父组件中的数据，sonMes接收"
+  }
+}) 
 ```
 
 ###### 5.优缺点
@@ -538,37 +541,39 @@ const vm = new Vue({
 
 ```html
 <div id="app">
-      <mycpn @btnclick="parClick"></mycpn>
- </div>
- <template id="soncpn">
-      <div>
-        <button  @click=btn(item)>点击</button>
-      </div>
- </template>
+  <mycpn @btnclick="parClick"></mycpn>
+</div>
+<template id="soncpn">
+  <div>
+    <button  @click=btn(item)>点击</button>
+  </div>
+</template>
 ```
 
+
+
 ```javascript
- Vue.component('mycpn',{
-        template:"#soncpn",
-        data(){
-          return {
-            item: 123
-          }
-        },
-        methods:{
-          btn(value){
-            this.$emit('btnclick', value)
-          }
-        }
-  })
-  const vm = new Vue({
-       el:"#app",
-       methods:{
-       		parClick(item) {
-            	console.log(item); 	// 123
-          }
-        }
-   })
+Vue.component('mycpn',{
+  template:"#soncpn",
+  data(){
+    return {
+      item: 123
+    }
+  },
+  methods:{
+    btn(value){
+      this.$emit('btnclick', value)
+    }
+  }
+})
+const vm = new Vue({
+ el:"#app",
+ methods:{
+    parClick(item) {
+      console.log(item); 	// 123
+    }
+  }
+})
 ```
 
 ##### 第7节: 父组件访问子组件的方法
@@ -664,10 +669,10 @@ const vm = new Vue({
   // 父组件  将子组件引入并注册后
   <template>
     <div class="parent">
-    	<son v-slot="title">
-        	<h1>父元素通过v-slot拿到了子组件插槽时绑定的title(也就是ti)数据</h1>
-        	<h2>{{title.name}}</h2> // firstName
-    	</son>
+      <son v-slot="title">
+        <h1>父元素通过v-slot拿到了子组件插槽时绑定的title(也就是ti)数据</h1>
+        <h2>{{title.name}}</h2> // firstName
+      </son>
     </div>
   </template>
   ```
@@ -819,13 +824,15 @@ const vm = new Vue({
 
         ```javascript
         module:{
-            rules:[
-                {
-                  test:/\.css$/, 	// 处理css文件 注意:此处正则键值不带引号 
-                  use:['style-loader','css-loader']
-         },
+          rules:[
+          	{
+            	test:/\.css$/, 	// 处理css文件 注意:此处正则键值不带引号 
+              use:['style-loader','css-loader']
+            },
+          ]
+        }
         ```
-
+        
         
 
 4. 安装配置less-loader和less
@@ -834,12 +841,12 @@ const vm = new Vue({
 
     ```javascript
     {
-    	 test:/\.less$/,
-    	 use:[
-    		   {loader: "style-loader"},
-           {loader: "css-loader"},
-           {loader: "less-loader"}
-    		 ]
+      test:/\.less$/,
+      use: [
+        {loader: "style-loader"},
+        {loader: "css-loader"},
+        {loader: "less-loader"}
+      ]
     }
     ```
 
@@ -873,19 +880,19 @@ const vm = new Vue({
 
     ```javascript
     output: {
-       publicPath: 'dist/'
+      publicPath: 'dist/'
     },
     /*-----------------*/
     {
-       test:/\.(jpg|png|gif|jpeg)$/,
-       use:[
-         { 
-           	loader: 'url-loader',
-          	options:{
-    				limit: 8192,	//当加载的图片小于limit时会将图片编译成base64字符串形式 大于limit时需用file-loader
-    				name: 'img/[name].[hash:8].[ext]' 	//注意单引号
-    				}
-    	 	}
+      test:/\.(jpg|png|gif|jpeg)$/,
+      use: [
+        { 
+          loader: 'url-loader',
+          options: {
+            limit: 8192,	//当加载的图片小于limit时会将图片编译成base64字符串形式 大于limit时需用file-loader
+            name: 'img/[name].[hash:8].[ext]' //注意单引号
+          }
+        }
       ]
     }
     ```
@@ -909,12 +916,12 @@ const vm = new Vue({
     ```javascript
     {
       test: /\.m?js$/, 	// 处理ES6语法
-      exclude: /(node_modules|bower_components)/, 	// 排除node中的JS文件不编译
-      use:[
-      	 {
-           loader: 'babel-loader',
-           options: {presets: ['es2015']}  // 由于未用第二套包“babel-preset-env”故将“babel/preset-env”改为“es2015”
-      	 }
+      exclude: /(node_modules|bower_components)/, // 排除node中的JS文件不编译
+      use: [
+      	{
+        	loader: 'babel-loader',
+         	options: {presets: ['es2015']}  // 由于未用第二套包“babel-preset-env”故将“babel/preset-env”改为“es2015”
+         }
       ]
     }
     ```
@@ -926,24 +933,24 @@ const vm = new Vue({
     ```json
     // 两种配置方法,首选第二个
     {
-        "presets": ["env","stage-0"],
-        "plugins": ["transform-runtime"]
-     }
+      "presets": ["env","stage-0"],
+      "plugins": ["transform-runtime"]
+    }
     /*-------------------*/
     {
-        "presets": [
-            [
-              "env", 
-              {
-              	"modules": false,
-             		 "targets": {
-                			"browsers": ["> 1%", "last 2 versions", "not ie <= 8"]
-             			 }
-           		 }
-            ],
-            "stage-2"
+      "presets": [
+          [
+            "env", 
+            {
+              "modules": false,
+               "targets": {
+                  "browsers": ["> 1%", "last 2 versions", "not ie <= 8"]
+               }
+             }
           ],
-          "plugins": ["transform-vue-jsx", "transform-runtime"]
+          "stage-2"
+        ],
+      "plugins": ["transform-vue-jsx", "transform-runtime"]
     }
     ```
 
@@ -1079,10 +1086,10 @@ const vm = new Vue({
 
         ```javascript
         devServer: {
-        		contentBase:'./dist', 	// 为哪个文件夹提供服务,默认为根目录
-         		inline:true; 	// 页面是否实时刷新
-         		port:8080;	 // 指定端口号,默认为8080故可不指定
-         }
+          contentBase: './dist', 	// 为哪个文件夹提供服务,默认为根目录
+          inline: true;	// 页面是否实时刷新
+          port: 8080;	// 指定端口号,默认为8080故可不指定
+        }
         ```
 
         
@@ -1237,18 +1244,18 @@ const vm = new Vue({
     
     Vue.use(VueRouter) 	// 使用路由
     const routes ={
-        {
-          path: '/home',
-          component: Home,
-        },
-         // 在此配置路由映射
+      {
+        path: '/home',
+        component: Home,
+      },
+     // 在此配置路由映射
     }
     const router = new VueRouter({
-       	routes, 		// 将路由挂载到实例上
-      	mode: 'history'
+      routes,	// 将路由挂载到实例上
+      mode: 'history'
      })		// 创建路由实例
     
-     export default router  // 导出路由
+    export default router  // 导出路由
     ```
 
     
@@ -1309,12 +1316,12 @@ const vm = new Vue({
 
         ```javascript
         const Home = resolve => {
-          	require.ensure( 
-             	 ['../components/Home.vue'],
-             	 () => {
-           				resolve(require('../components/Home.vue'))
-         				}
-         		)
+        	require.ensure( 
+           ['../components/Home.vue'],
+           () => {
+            resolve(require('../components/Home.vue'))
+            }
+          )
         }
         ```
 
@@ -1449,9 +1456,9 @@ const vm = new Vue({
           activated() {
             this.$router.push(this.path)
           },
-           beforeRouteLeave() {
-             this.path = this.$route.path
-           }
+          beforeRouteLeave() {
+            this.path = this.$route.path
+          }
         }
         ```
 
@@ -1514,15 +1521,17 @@ const vm = new Vue({
 
     -   如: add(state,getters){} 即只接收state属性和它本身getters
 
-    - ```javascript
+    - 
+        
+        ```javascript
         state: {
-          num: 1
+        	num: 1
         },
         getters: {
           reduec() {
             return 123
           },
-        	add(state,getters) {
+          add(state,getters) {
             console.log(state.num)  // 1
             console.log(getters.reduce) // 123
             // state、getters只是形参,写为aaa也无所谓
@@ -1536,7 +1545,7 @@ const vm = new Vue({
         getters: {  
           add() {
             return function(str) {console.log(str)
-             // 简化写法：return str => {console.log(str)}
+            // 简化写法：return str => {console.log(str)}
             }
           }
         }
@@ -1560,13 +1569,17 @@ const vm = new Vue({
         }
         /* -------------------------------------- */
         mutations: {
-        	add(state,str) {
-        		console.log(str) // 123
-        	}
+          add(state,str) {
+            console.log(str) // 123
+          }
         }
         ```
 
-    - ```javascript
+        
+        
+    - 
+        
+        ```javascript
         data() {
           return {
             Obj: {id: 110,name: ss}
@@ -1582,9 +1595,9 @@ const vm = new Vue({
         }
         /* -------------------------------------- */
         mutations: {
-        	add(state,payLoad) {
-        		console.log(payLoad.id) // 110
-        	}
+          add(state,payLoad) {
+            console.log(payLoad.id) // 110
+          }
         }
         ```
 
@@ -1602,9 +1615,9 @@ const vm = new Vue({
         /* mutations文件中 */
         import {STR1} from 'mutations-type'
         mutations: {
-            [STR1]() {
-              console.log(123)
-            }
+          [STR1]() {
+            console.log(123)
+          }
         }
         
         /* methods文件中 */
@@ -1645,7 +1658,9 @@ const vm = new Vue({
         this.$store.dispatch('add',123)
       }
     }
-    /*--------------------------------------------*/
+    ```
+
+    ```javascript
     import Vue from 'vue'
     import Vuex from 'vuex'
     Vue.use(Vuex)
@@ -1760,11 +1775,11 @@ const vm = new Vue({
     /*----------------------------------------------*/
     import { mapGetters } from 'vuex'
     computed： {
-    	...mapGetters({  // 解构
+      ...mapGetters({  // 解构
         addA: 'addOne',
         addB: 'addTwo'
-      }) 		// 写法1,
-      // ...mapGetters(['addOne','addTwo'])  		// 写法2
+    })	// 写法1,
+    // ...mapGetters(['addOne','addTwo'])  		// 写法2
     }
     ```
 
@@ -1816,12 +1831,12 @@ const vm = new Vue({
 
     ```javascript
     axios.all(
-     	 axios({}),
-      	axios({})
-      )
-      .then(res => {
-          console.log(res[0] + res[1])
-      })
+      axios({}),
+      axios({})
+    )
+    .then(res => {
+      console.log(res[0] + res[1])
+    })
     ```
 
     
@@ -1833,8 +1848,8 @@ const vm = new Vue({
       axios({}),
       axios({})
     )
-      .then(axios.spread(res1,res2) => {
-      		console.log(res1 + res2)
+    .then(axios.spread(res1,res2) => {
+      console.log(res1 + res2)
     }) 
     ```
 
@@ -1921,8 +1936,8 @@ const vm = new Vue({
 
     ```javascript
     const service1 = axios.create({
-        baseURL: 'http://152.136.185.210:7878/api/m5',
-        timeout: 5000
+      baseURL: 'http://152.136.185.210:7878/api/m5',
+      timeout: 5000
     })
     service1({
       url: '/home/data'
@@ -1952,13 +1967,13 @@ const vm = new Vue({
       timeout: 5000
     })
     service.interceptors.request.use(
-    	config => {
+      config => {
         return config
       },
       error => {}
     )
     service.interceptors.response.use(
-    	res => {
+      res => {
         return res
       },
       error => {}
@@ -1970,11 +1985,12 @@ const vm = new Vue({
 
 ##### 第7节：其他网络相关
 
-	1. 跨域使用token的方式维持状态
-	2. 不跨域则使用cookie在客户端或session在服务器端记录状态
+1. 跨域使用token的方式维持状态
 
-3. 登录-token原理分析:
-    -  登录页面输入用户名和密码经过服务器验证后会生成该用户的token并返回,客户端存储token,后续所有的请求都携带该token发送请求,服务器验证token是否通过
+2. 不跨域则使用cookie在客户端或session在服务器端记录状态
+
+3. 登录-token原理分析
+    - 登录页面输入用户名和密码经过服务器验证后会生成该用户的token并返回,客户端存储token,后续所有的请求都携带该token发送请求,服务器验证token是否通过
 
 ------
 
@@ -2006,7 +2022,7 @@ const vm = new Vue({
 
     ```css
     .wrapper /deep/ .swiper-pagination-bullet-active{
-     	background: #fff;
+      background: #fff;
     }
     ```
 
