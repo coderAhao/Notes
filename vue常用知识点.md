@@ -245,3 +245,195 @@ function formateDate(date, fmt) {
 
 <img src="imgs/vueImg/vue响应式原理.png" alt="vue响应式原理"  />
 
+
+
+##### 7.v-if与v-for
+
+哪个优先级更高？如果同时出现如何优化性能更好
+
+```vue
+<!--1.v-if与v-for同级时 -->
+<p v-for="item in items" :key="item.id" :v-if="flag">{{item.name}}</p>
+
+<!--2.v-if与v-for不同级时 -->
+<div v-if="flag">
+	<p v-for="item in items" :key="item.id">{{item.name}}</p>
+</div> 
+```
+
+
+
+```javascript
+export default {
+	data() {
+		return {
+    	items: [
+      	{id: 1,name: '张三'},
+      	{id: 2,name: '李四'}
+    	],
+    	flag: true,
+  	}
+	},
+	mounted() {
+  	console.log(this.$options.render);
+	}
+}
+```
+
+```javascript
+// 打印同级时的渲染函数
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "search" },
+    _vm._l(_vm.items, function(item) {
+      return _c("p", { key: item.id, attrs: { "v-if": _vm.flag } }, [
+        _vm._v(_vm._s(item.name))
+      ])
+    }),
+    0
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+export { render, staticRenderFns }
+// "_l"为列表渲染函数 会循环输出“_vm.items”,每次循环时执行后面的function
+// 根据以上打印出的render函数可知 先执行列表渲染函数再判断v-if
+```
+
+```javascript
+// 打印不同级时的渲染函数
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "search" }, [
+    _vm.flag
+      ? _c(
+          "div",
+          _vm._l(_vm.items, function(item) {
+            return _c("p", { key: item.id }, [_vm._v(_vm._s(item.name))])
+          }),
+          0
+        )
+      : _vm._e()
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+export { render, staticRenderFns }
+// 根据打印出的render函数可知会先根据flag的结果是执行具体的函数还是执行“_e()”这个空函数
+```
+
+- 综上可知：
+    - 同级别时，v-for优先v-if被解析，每次渲染都会先执行循环函数再判断，浪费性能
+    - 优化：在v-for外部嵌套一层v-if，先判断再循环
+
+##### 8.组件通信
+
+- 使用场景分为三类：父子、兄弟和跨级别
+- 通信方式有六种：
+    - props
+    - $emit/$on、$bus
+    - $parenrt/$children、ref
+    - vuex
+    - $attrs/$listeners
+    - provide/inject
+
+
+
+##### 9.vue性能优化方法
+
+- 这里主要探讨代码层面的优化
+
+- 路由懒加载
+
+    - 打包时减小体积、加载时按需加载
+
+- keep-alive 缓存页面
+
+    - 可include和exclude更细节处理页面
+
+- v-show复用DOM
+
+    - 某些渲染时间较长或任务较重的代码块进行复用
+
+- 长列表性能优化
+
+    - 仅展示数据
+
+        - 列表仅做数据展示而不改变就不需响应化，则可将其冻结
+
+        - ```javascript
+            // showData 要展示的数据  getData某个数据
+            showData = object.freeze(getData)
+            ```
+
+            
+
+    - 大数据长列表
+
+        - 可采用虚拟滚动，即只渲染视图区域中的内容，用户滚动时处理滚动行为，动态更新或渲染，DOM可复用更新，不需消耗太多资源
+        - 推荐库：vue-virtual-scroller、vue-vvirtual-scroll-list
+
+- 图片懒加载
+
+    - 为提高页面加载速度，对图片过多的页面，未出现在视图区域中的图片先不做加载，等到滚动到可视区域再加载
+
+- 第三方插件按需引入
+
+    - 如element-ui按需引入避免体积太大
+
+##### 10.vue-router 导航钩子
+
+导航钩子形式共有三种
+
+- 全局导航钩子 
+
+    - `beforeEach(to,from,next){}`  路由改变前调用
+        - 参数：to即将进入的目标路由，from当前正要离开的路由对象，next路由控制参数
+        - next()进入下一个钩子、next(false)取消导航、next('/login')强制进入到此路由
+        - 常用于验证用户登录权限
+    - `afterEach(to,from){}` 路由改变后的钩子
+        - 少个参数next,用法同beforeEach
+        - 常用于自动让页面返回最顶端
+
+- 路由配置中的导航钩子
+
+    - `beforeEnter(to,from,next){}` 用法同全局导航钩子
+
+    - ```javascript
+        // 在路由配置中进行设置
+        const router = new VueRouter({
+        	routes: [
+        		{
+        			path: '/login',
+        			component: Login,
+        			beforeEnter: (to,from,next) => {
+        				// ...
+        			}
+        		}
+        	]
+        })
+        ```
+
+- 组件内的钩子函数
+
+    - 在单个vue文件中使用
+    - beforeRouteEnter(to,from,next)
+        - 该组件对应路由被确认前调用
+        - 此时实例还未被创建，故不能获取实例，即this
+    - beforeRouterUpdate(to,from,next)
+        - 当前路由改变，但该组件复用时调用
+        - 例：对于一个带有动态参数的路径“/foo/:id” 在“/foo/1”和"/foo/2"跳转时调用
+        - 可访问组件实例this
+    - beforeRouterLeave(to,from,next)
+        - 导航离开该组件的对应路由时调用
+        - 可访问组件实例this
+
+    

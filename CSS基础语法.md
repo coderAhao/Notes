@@ -151,7 +151,7 @@
 
 ######  3.letter-spacing:字符间距
 
-1. normal/px/em/-px/-em 英文每个字母/中文每个文字被隔开
+1. normal/px/em/-px/-em 英文每个字母/中文每个文字被隔开 （若文字有偏移可设置text-indent矫正）
 
 ######  4.word-spacing:单词间距
 
@@ -233,7 +233,7 @@
    -  -webkit-line-clamp:number(文本第几行显示省略);
    - overflow:hidden; 
 
-   - text-overflow:ellipsis
+   - text-overflow:ellipsis （一般设置了前四个属性即可）
 
    - 由于兼容性问题推荐后台人员做此效果
 

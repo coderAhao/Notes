@@ -167,7 +167,20 @@
     - number和string用“+”操作时会将number转为字符串进行拼接 
         - 如:b=a+1+2  b结果为a12,因为先a+1再a1+2 
         - b=a+(1+2) 结果为a3
-    -   number和string用“-”操作时会将string转换为number
+        
+    - number和string用“-”操作时会将string转换为number
+
+    - 自增++
+
+        - ```javascript
+            let a = 9;
+            let b = ++a + 1 //	a=10 b=11
+            let c = 9
+            let d = c++ +1 // c=10 d=10
+            
+            ```
+
+            
 
 -  字符串运算符 
 
@@ -336,34 +349,35 @@
     - arr.reverse() 数组中的元素逆序
 
     - arr.sort() 数组中的元素按ASCII码从小到大排序
-        -  arr.sort(fun) 可自定义给排序规则
-
-    - arr.fill(val,[start],[end]) 将数组中(指定下标)元素用val填充(其实就是替换)
-
-    - arr.concat(数组/元素) 将数组/元素和arr合并为一个新的数组，原数组不改变
-
-    - arr.splice(index,num,val...)对一个数组在指定下标范围内删除/添加元素，原数组被改变
-
+    
+-  arr.sort(fun) 可自定义给排序规则
+   
+- arr.fill(val,[start],[end]) 将数组中(指定下标)元素用val填充(其实就是替换)
+  
+- arr.concat(数组/元素) 将数组/元素和arr合并为一个新的数组，原数组不改变
+  
+- arr.splice(index,num,val...)对一个数组在指定下标范围内删除/添加元素，原数组被改变
+  
         - 从index开始,切num个数据(num为0则表示添加),添加元素val(val可为多个元素) 
-        - 若只有index则从此删完 
-
+    - 若只有index则从此删完 
+    
         - 若index大于等于数组长则从末尾开始;
-        - 若index小于0则从数组长加index开始;若还小于0则从头部开始
-
-    - arr.slice(start,end) 从一个数组指定下标范围内切取元素拷贝到新数组中,不改变原数组 
-
+    - 若index小于0则从数组长加index开始;若还小于0则从头部开始
+    
+- arr.slice(start,end) 从一个数组指定下标范围内切取元素拷贝到新数组中,不改变原数组 
+  
         - 从下标start开始切到end(不包含end)
         - 省略end则表示切到尾部 
-        - 若只有start且为负则从尾部开始 
-
-        - 当提取的参数为负值时
-
-            ```javascript
-            let str="12345678"
-            str.slice(1,-3)   // str长度为8,-3+8=5,则提取str中[1,5）的数据
-            str.slice(6,-3)   // -3+8=5,,此时[6,5) 6大于5,提取为空
-            str.slice(-6,-3)  // -6+8=2,-3+8=5 则提取str中[2,5)的数据
-            ```
+    - 若只有start且为负则从尾部开始 
+    
+    - 当提取的参数为负值时
+    
+        ```javascript
+        let str="12345678"
+        str.slice(1,-3)   // str长度为8,-3+8=5,则提取str中[1,5）的数据
+        str.slice(6,-3)   // -3+8=5,,此时[6,5) 6大于5,提取为空
+        str.slice(-6,-3)  // -6+8=2,-3+8=5 则提取str中[2,5)的数据
+        ```
 
 ##### 3.3 迭代方法
 
@@ -372,8 +386,22 @@
     - `arrName.forEach(function(value,index,arrName){......})`
 
     - 数组arr中的每一个元素依次执行函数 
+
     - 形参为三个可选的默认参数
+
     - value当前值、index当前索引、arrName数组本身
+
+    - 还可接受第二个参数
+
+        - ```javascript
+            const arr = [1,2]
+            arr.forEach(item => {
+            	console.log(item, this)
+            }, 'aaa')
+            // 函数中的this指向aaa 若无第二个参数则this指向window
+            ```
+
+            
 
 - filter()
 
@@ -410,7 +438,36 @@
     - `arrName.every(function(value, index, arrName){return ...})`
     - 与some()方法结果相反，遍历数组中的每一项,只有所有项都符合要求才返回true，有一项不满足则返回false
 
+- map() (映射操作)
 
+    - 遍历数组中的每一个元素并计算返回,不改变原数组 (内部会自动创建一个新数组,只需用变量接收即可)
+
+    - 对于空数组map中的回调函数不会执行
+
+    - ```javascript
+        const arr = [10,20,30];
+          let newArr = arr.map(function (n) {
+            return n*2;
+          }) 
+          console.log(newArr) // [20,40,60]
+        ```
+
+- reduce() (汇总操作):
+
+    - ```javascript
+        const arr = [10,20,30];
+          let total = arr.reduce(function (preValue,n) {
+            return preValue + n;
+          },0)
+        console.log(total) // 60
+        // 理解1: 接收一个函数和初始值(实质为接受两个参数只是第一个参数比较特殊为一个函数)
+        // 第一次preValue为初始值0 形参n为10
+        // 第二次preValue为“0+10=10” 形参n为20
+        // 第三次preValue为“10+20=30” 形参为30 遍历完毕将其return出去“30+30=60”
+        // 理解2: arr.reduce(num,初始值) reduce函数会对arr进行遍历
+        ```
+
+        
 
 ------
 
@@ -849,11 +906,11 @@
     - 内部创建一个闭包,闭包可以访问私有变量,因此创建用于访问私有变量的公用方法称作特权方法
 
         ```javascript
-        function people(){
-        	var name = '张三';
-          this.getName=function(){
+        function people() {
+          var name = '张三';
+          this.getName = function() {
             return name;
-        	}
+        }
         }
         var p1 = new people();   // 注意需用new 
         console.log(p1.getName());
@@ -872,17 +929,17 @@
         (function() {	// 创建私有作用域 
           var name = '张三';	// 定义私有变量
           User = function(){};	// 定义构造函数 注意此时User为全局变量 
-          User.prototype.getName = function(){
+          User.prototype.getName = function() {
             return name;
           }
-          User.prototype.setName = function(value){
+          User.prototype.setName = function(value) {
             name = value
           }
         })()
         var p1 = new User();
-        console.log(p1.getName());	// “张三” 
+        console.log(p1.getName());	//“张三” 
         p1.setName('李四');
-        console.log(p1.getName());	// “李四” 
+        console.log(p1.getName());	//“李四” 
         ```
 
         
@@ -925,23 +982,24 @@
 
         ```javascript
         function cal(num1,num2,fn) {
-        	return fn(num1,num2);
+          return fn(num1,num2);
         }
         console.log(
           cal(45,55,function (a,b) {
-        		return a+b;
-        	})
+            return a+b;
+          })
         );
         console.log(
           cal(45,55,function (a,b) {
-        		return a*b;
-        	})
+            return a*b;
+          })
         )
         ```
 
     - 通过在函数体中设置回调函数,可根据调用时传递不同的参数在函数体特定位置实现不同功能,相当于在函数体内根据用户需求完成了不同功能的定制
 
     - JS内置回调函数方法:
+      
         -  find() every() some() forEach() map() reduce() reduceRight()等 
 
 ##### 4.9 函数嵌套与递归 
@@ -966,7 +1024,7 @@
         // 典型的递归函数: 阶乘
         function fun(n) {
           if (n == 1) {
-          	return 1; 	//递归出口
+            return 1; 	//递归出口
           }
           return n * fun(n-1);
         }
@@ -1058,7 +1116,19 @@
     - for...in语法 (此语法可遍历数组和对象)
     - value in objName  判断某对象是否有某个成员,返回值true/false
 
-    - delete objName.key "delete"可以删除对象
+- 删除对象某个属性
+
+    - delete objName.key "delete"可以删除对象 （不推荐使用此方法）
+
+    - 使用剩余参数加解构赋值 生成去除某个属性的新对象
+
+        ```javascript
+        const a = { b: 1, c: 2, d: 3 }
+        let { b, ...e } = { ...a }
+        console.log(e) // {c: 2, d: 3}
+        ```
+
+        
 
 ##### 5.3 自定义构造函数
 
@@ -1081,13 +1151,13 @@
 
     - ```javascript
         function create(name,weapon) {
-        	var per = new Object();
-        	per.na = name;
-        	per.wea = weapon;
-        	per.run = function () {
-        		return this.na + '的武器是' + this.wea;
-        	}
-        	return per;  	// 此步看做出厂,必须有
+          var per = new Object();
+          per.na = name;
+          per.wea = weapon;
+          per.run = function () {
+          return this.na + '的武器是' + this.wea;
+          }
+          return per;  	// 此步看做出厂,必须有
         }
         var p1 = create('孙悟空','金箍棒');
         console.log(p1.run()); 	//“孙悟空的武器是金箍棒”
@@ -1115,21 +1185,23 @@
 
     - instanceof 验证实例对象与原型对象之间的关系, 用法：A instanceof B 返回值true/false
 
-    - ```javascript
+    - 
+      
+        ```javascript
         function create(name,weapon) {
-        		this.na = name;		// 实例成员 只能通过“p1.name”来访问name
-        		this.wea = weapon;
-        		this.run = function() {
-        				return this.na + '的武器是' + this.wea;
-        		}
+          this.na = name;	// 实例成员 只能通过“p1.name”来访问name
+          this.wea = weapon;
+          this.run = function() {
+            return this.na + '的武器是' + this.wea;
+          }
         }
         create.sex = man; // 静态成员 只能通过create来访问sex
         var p1= new create('孙悟空','金箍棒');
-        console.log(p1.run());  	//“孙悟空的武器是金箍棒”
+        console.log(p1.run());	//“孙悟空的武器是金箍棒”
         var p2=new Object();
-        create.call(p2,'妖怪','葫芦');			// call()和apply()方法做对象冒充 两种方法本质类似,只是传参方式不同而已
+        create.call(p2,'妖怪','葫芦');	// call()和apply()方法做对象冒充 两种方法本质类似,只是传参方式不同而已
         // create.apply(p2,['妖怪','葫芦']);
-        console.log(p2.run());  	//“妖怪的武器是葫芦”
+        console.log(p2.run());	//“妖怪的武器是葫芦”
         ```
         
         
@@ -1146,18 +1218,18 @@
         create.prototype.na='喽啰';   	// 此时创建的原型字面量直接指向构造函数create() 
         create.prototype.wea='大刀';
         create.prototype.run=function(){
-        	return this.na+'的武器是'+this.wea;
+          return this.na+'的武器是'+this.wea;
         }
         /*-------------------------------------------------------------*/
         // 创建方式2
         function create(){};
         create.prototype = {
-        	 constructor: create, // 强制指向create()不加此行代码也可,就是和方式1指向不同 当需该指向则加 
-        		na: '喽啰',  // 此时创建的字面量指向创建对象create.prototype而非create(),故添加constructor 
-        		wea: '大刀',
-        		run: function() {
-        			return this.na + '的武器是' + this.wea;
-        		}
+          constructor: create, // 强制指向create()不加此行代码也可,就是和方式1指向不同 当需该指向则加 
+          na: '喽啰',  // 此时创建的字面量指向创建对象create.prototype而非create(),故添加constructor 
+          wea: '大刀',
+          run: function() {
+            return this.na + '的武器是' + this.wea;
+          }
         } 
         var p1=new create();
         console.log(p1.run());  // “喽啰的武器是大刀”
@@ -1175,8 +1247,9 @@
         - 如果p1的'na'属性是继承自prototype,而非自已的本地属性则返回false
 
     - in运算符判断某个实例是否有某个属性,不管它是自己的本地属性还是继承的prototype 
-        - 用法：'na' in p1
-
+      
+    - 用法：'na' in p1
+      
     - 缺点:
 
         - 构造函数不能传参,使用原型不能通过给构造函数传参来初始化实例属性
@@ -1187,13 +1260,13 @@
 
     - ```javascript
         function create(name,weapon) {
-        		constructor: create;
-        		this.na = name;
-        		this.wea=weapon;
+          constructor: create;
+          this.na = name;
+          this.wea=weapon;
         }	
         create.prototype = {
-        		run: function(){
-              return this.na+'的武器是' + this.wea
+          run: function(){
+            return this.na+'的武器是' + this.wea
             }
         }
         //写成这样更好理解 create.prototype.run=function(){return this.na+'的武器是'+this.wea}
@@ -1209,13 +1282,13 @@
 
     - ```javascript
         function create(name,weapon) {
-        		this.na = name;
-        		this.wea = weapon;
-        		console.log('开始初始化');
-        		create.prototype.run = function() {
-              return this.na + '的武器是' + this.wea
-            }
-        		console.log('结束初始化');
+          this.na = name;
+          this.wea = weapon;
+          console.log('开始初始化');
+          create.prototype.run = function() {
+            return this.na + '的武器是' + this.wea
+          }
+          console.log('结束初始化');
         }
         var p1 = new create('喽啰','大刀');
         var p2 = new create('小兵','长矛');
@@ -1227,16 +1300,16 @@
         ```
 
         ```javascript
-        function create(name,weapon){
-        		this.na=name;
-        		this.wea=weapon;
-        		if(this.run != 'function') {
-        			  console.log('开始初始化');
-        				create.prototype.run = function(){
-                  return this.na + '的武器是' + this.wea;
-                }
-        				console.log('结束初始化');
-        		}
+        function create(name,weapon) {
+          this.na=name;
+          this.wea=weapon;
+          if(this.run != 'function') {
+            console.log('开始初始化');
+            create.prototype.run = function() {
+              return this.na + '的武器是' + this.wea;
+            }
+          console.log('结束初始化');
+          }
         }
         ```
 
@@ -1261,23 +1334,23 @@
         - 缺点:由于是构造函数,函数传参是按值传递造成资源浪费
 
         - ```javascript
-            function monkey(type,home){
-            	this.ty = type;
-            	this.ho = home;
+            function monkey(type,home) {
+              this.ty = type;
+              this.ho = home;
             }
             function magic(hp) {
-            	this.h = hp;
+              this.h = hp;
             }
             function magic_monkey(type,home,hp) {
-            	monkey.call(this,type,home);    // 冒充第一个父类的对象
-            	magic.call(this,hp);            				// 冒充第二个父类的对象
-            	this.skill = '七十二变';
+              monkey.call(this,type,home);	// 冒充第一个父类的对象
+              magic.call(this,hp);	// 冒充第二个父类的对象
+              this.skill = '七十二变';
             }
             var wukong=new magic_monkey('猴子','花果山','生命值');
-            console.log(wukong.ty);  // “猴子”
-            console.log(wukong.ho);  // “花果山”
-            console.log(wukong.h);  //  “生命值”
-            console.log(wukong.skill);  // “七十二变”
+            console.log(wukong.ty);  //“猴子”
+            console.log(wukong.ho);  //“花果山”
+            console.log(wukong.h);  //“生命值”
+            console.log(wukong.skill);  //“七十二变”
             ```
 
     - 原型链继承
@@ -1346,7 +1419,7 @@
         -  `str.substring(-2,3)` 效果同上
 
     -  `str.substr(n,m)`   从n开始,提取m个字符
-        -  str.substr(-5,3)  从右向左数到第五个字符,从此位置向右取3个字符 若第二个参数为负则取空 (注意:因为第二个参数含义代表取几个字符)
+        -  str.substr(-5,3)  从右向左数到第五个字符,从此位置向右取3个字符 若第二  个参数为负则取空 (注意:因为第二个参数含义代表取几个字符)
 
     -  `str.split(x,num)`  str中有x,则以x为分割符将其分割为字符串数组,否则str变为只有它本身的字符串数组 (相当于未分割,只是变为了数组而已 ；number为可选参数,即将字符串分为几个数组 ；若number小于理论,后面的则被去掉)
 
@@ -1363,8 +1436,9 @@
     -  注:JS中的字符串是不可变的，string类定义的方法都不能改变字符串的内容,string方法返回的是全新的字符串而非改变原字符串
 
 - Number对象
-    - `num.toFixed(n)` 四舍五入保留小数点后n位 (无参数则保留正整数) 
-
+  
+- `num.toFixed(n)` 四舍五入保留小数点后n位 (无参数则保留正整数) 
+  
 - Math对象
 
     -  `Math.PI()`
@@ -2384,4 +2458,29 @@ myAjax.onreadystatechange = function() {
 - 关系网
 
     ![](imgs/JavaScriptImg/原型链关系网.png)
+
+#### 第十章 : 事件循环机制
+
+##### 10.1 宏任务
+
+- 包括整体代码(即同步代码)、setTimeout、setInterval
+
+##### 10.2 微任务
+
+- Promise、proces.nextTick
+
+##### 10.3 为何存在异步
+
+- 如果不存在异步，代码只能自上而下依次执行，如果上一行代码解析时间过长，下面的代码就会阻塞，导致用户体验差
+- 异步的实现：通过EventLoop
+
+##### 10.4 EventLoop
+
+- JS执行机制，先判断是同步还是异步，同步进入主线程，异步则推入event table(事件列表)
+- 异步任务在event table中注册函数，满足触发条件后被推入 event queue(事件队列)
+- 同步任务在主线程上一直执行，直至空闲时，去event queue中查看是否有可执行的异步任务，如果有则推入主线程中
+
+##### 10.5 JS为单线程
+
+- 如果为多线程，如果同时有两个操作，一个对DOM进行编辑，一个进行删除，浏览器如何执行？
 

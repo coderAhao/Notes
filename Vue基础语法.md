@@ -222,6 +222,13 @@
 - 修改数组长度Arr.length=num
   - 解决方法: 通过修改splice()数组中的元素
 
+###### 3.响应式对象添加或删除属性
+
+- vue监测不到响应式对象属性的变动,解决方案：
+    - vue自带的vue.set(obj,key,value)添加属性
+    - vue.delete(obj,key)删除属性
+    - obj.assign方法用新对象替换原对象
+
 ##### 第4节: 计算属性
 
 1. 计算属性有两个特定的get和set方法,但一般不写set方法则为只读属性
@@ -251,11 +258,91 @@ computed:{
 
 4. 特点
    - 性能更高,其内部的方法只调用一次
-   - 计算属性依赖缓存,当数据变化时才会再次重新取值再次调用
+   - 计算属性依赖缓存,计算结果会被缓存起来，其他DOM可直接使用结果；
+   - 当数据变化时才会再次重新取值计算再次调用
    - 当遍历大数组和做大量计算时使用计算属性
    - 而methods则是只要被渲染就会被调用
 
-##### 第5节: 过滤器
+##### 第5节: watch
+
+ 1. watch监控一个值的变换，并调用因为变化需要执行的方法
+
+ 2. 当数据发生变化时，我们通过watch可以拿到变化前和变化后的值，之后做一系列操作
+
+ 3. 监听单个值变化
+
+    ```vue
+    <template>
+      <div>
+        <input v-model="demo"></input>
+      </div>
+    </template>
+    
+    <script>
+    // v-model、data和watch需保持变量名一样
+      export default {
+        data() {
+          return {
+            demo: '',
+          };
+        },
+        watch: {
+          //	此种写法首次绑定不会执行监听函数，有值发生改变才会执行
+          demo(newVal,oldVal) {
+            console.log(newVal + oldValue)
+          }
+         
+          /*	
+          此种写法首次绑定则会执行监听函数
+          demo:{
+            handler(newVal,oldVal) {
+               console.log(newVal + oldValue)
+    　      },
+             immediate: true
+          }	
+          */
+        }
+      };
+    </script>
+    ```
+
+4. 监听对象里面单个值变化
+
+    ```vue
+    <template>
+      <div>
+        <input v-model="demo.name"></input>
+      </div>
+    </template>
+    
+    <script>
+    // v-model、data和watch需保持变量名一样
+      export default {
+        data() {
+          return {
+            demo: {
+              name: '',
+          };
+        },
+        watch: {
+          'demo.name'(newVal,oldVal) {
+            console.log(newVal + oldValue)
+          }
+        }
+      };
+    </script>
+    ```
+
+5. computed、watch、methods区别
+    - computed 
+        - 可当做属性使用，结果会被缓存,当依赖的属性发生变化才会重新计算
+        - 一个属性受多个属性影响时使用，如购物车商品结算，总金额跟随数量变化
+    - watch 
+        - 可看做对象，键是观察的变量，值是对应的回调函数，可看做是computed和methods的结合
+        - 数据变化时执行异步或开销较大的操作时使用，如搜索数据
+    - methods 是个方法，表示一个具体的操作过程，主要书写业务逻辑
+
+##### 第6节: 过滤器
 
 1. 在插值“{{}}”中数据的尾部添加管道符“|” 
 
@@ -301,8 +388,8 @@ computed:{
         
         // 注：引入的filtername方法内部处理完毕需将结果return
         ```
-
-
+    
+    3.  注意： 私有filters中拿不到this，故过滤器方法中若用到this，则改变策略，即不使用过滤器，而在methods或计算属性中写方法，传参调用 （此问题尤雨溪在github上回答过）
 
 ------
 
@@ -331,6 +418,7 @@ computed:{
     - 如：Vue.component('my-cpn',myComponent)
 
 3. 使用组件:
+    
     - <my-cpn></my-cpn>   
 
 ###### 2. 方法2:
@@ -391,8 +479,9 @@ computed:{
 ##### 第4节: 组件中的data
 
 - 组件内部不能访问实例中的数据,故需有自己的data数据,但data必须写为一个函数,其内部再返回一个对象
-    - 如: data(){return {key:value}}
-
+    
+- 如: data(){return {key:value}}
+    
 - data写为函数而非对象的原因
 
     - 组件的目的就是为了进行复用,当组件复用时,组件内的data数据也应跟随模板一块复用,若data内直接写为对象,相当于把data直接挂载到这个组件的原型上了,所有复用的组件共用一个data， 当别的地方复用组件并修改组件内的数据时,其他地方复用的组件也会受到影响，因此data应跟随组件进行深拷贝，这样每复用一次组件，就会返回一份新的data
@@ -639,7 +728,63 @@ const vm = new Vue({
         - `this.$bus.$off('methodName')`或`bus.$off('methodName')` 移除某个事件监听
         - `this.$bus.$off()`或`bus.$off()` 移除所有事件监听
 
-##### 第10节: 插槽
+##### 第10节: 组件通信方式总结
+
+- 通信方式共有12种
+
+- props
+
+- $emit/v-on(即@)
+
+- .sync
+
+    - 可以实现数据双向绑定，即子组件可修改父组件传来的数据且父组件的数据同步改变
+
+    - ```javascript
+        // 用法
+        <children :data.sync="propData" />
+        //  在要传的数据后加修饰符“.sync”即可
+        ```
+
+        
+
+- v-model
+
+    - ![](imgs/vueImg/组件通信方式-01.png)
+
+- ref
+
+- children/parent
+
+- attrs/listeners
+
+    - ![](imgs/vueImg/组件通信方式-02.png)
+
+- provide/inject
+
+    - ![](imgs/vueImg/组件通信方式-03.png)
+
+- EventBus
+
+    - ![](imgs/vueImg/组件通信方式-04.1.png)
+    - ![](imgs/vueImg/组件通信方式-04.2.png)
+
+- Vuex
+
+- $root 可以拿到 App.vue 里的数据和方法
+
+- slot
+
+- 父子组件通信
+
+    - props、attrs/listeners、$emit/v-on、ref、.sync、v-model、children/parent
+
+- 兄弟组件通信
+    - EventBus、Vuex、$parent
+- 跨层级组件通信
+    - provide/inject、EventBus、Vuex、attrs/listeners、$root
+
+##### 第11节: 插槽
 
 ###### 1. 基本使用:
 
@@ -702,7 +847,7 @@ const vm = new Vue({
   
   
 
-##### 第11节: 生命周期   
+##### 第12节: 生命周期   
 
 1. 生命周期图示
 
@@ -810,8 +955,9 @@ const vm = new Vue({
 1. webpack仅仅是处理JS之间的关系，CSS、图片之类的还需插件loader来处理
 
 2. 处理css文件下载css-loader和style-loader
-    - css-loader负责加载 ，style-loader负责解析 ，二者都要安装
-
+    
+- css-loader负责加载 ，style-loader负责解析 ，二者都要安装
+    
 3. loader使用安装步骤:
 
     -  “npm i --save-dev css-loader@version style-loader@version” 进行安装(二者版本不对应可能会出错）
@@ -998,8 +1144,9 @@ const vm = new Vue({
 ##### 第7节: 直接引用“.vue文件”
 
 1. 需对“.vue”进行处理，安装“vue-loader”和“vue-template-complier”
-    - npm i vue-loader@13.0.0 vue-template-complier@2.5.1 --save-dev
-
+    
+- npm i vue-loader@13.0.0 vue-template-complier@2.5.1 --save-dev
+    
 2. 配置文件
 
     ```javascript
@@ -1209,26 +1356,51 @@ const vm = new Vue({
 ##### 第1节:基本概念
 
 1. 路由:通过互联网将信息从源地址传输到目的地址的活动
+
 2. 路由器提供了两种机制:路由和转送
 
     - 路由:决定数据包从来源到目的地的路径
 
     - 转送:将输入端数据转移到合适的输出端
+    
 3. 路由表:本质为映射表,决定了数据包的指向 (映射表: 内网ip对应电脑mac(物理)地址)
+
 4. 后端路由:后端处理URL和页面之间映射的关系，对于普通网站来说所有的超链接都是url地址,所有的url地址都对应服务器上的资源
+
 5. SPA(单页面富应用)主要特点:在前后端分离的基础上增加了前端路由
+
 6. 前端路由:
     - 对于单页面应用程序来说,主要通过hash(即#号)实现不同页面之间的切换，这种由hash改变切换页面的方式叫前端路由
-    - 核心：改变URL但页面不进行整体刷新
+    - 核心：改变URL但页面不进行整体刷新，但如果点击了刷新按钮，则会向服务器重新请求所有资源
     - hash特点：HTTP请求中不会包含hash内容,所以单页面程序内容跳转主要由hash实现
+    - 一次性把所有的HTML css和JS请求过来，然后点到哪个路由，就懒加载渲染对应的页面，路由改变时，并未向服务器请求数据
+    
 7. URL的hash也是锚点,本质上是改变window.location的href属性；可直接通过location.hash来改变href但不刷新页面
+
 8. router
 
-    - route 一个路由信息对象；
-    - routes 一组路由信息对象；
-    - router 路由控制对象
-
+    - route 一个路由信息对象(当前路由对象)
+    - routes 一组路由信息对象
+    - router 路由控制对象(路由器对象)
     -  路由为插件,所有插件都需“Vue.use(插件名)”来使用
+    
+9. 后端渲染
+
+    - 早期的网站开发整个HTML是由服务器渲染好返回给客户端进行展示
+
+    - 后端写的代码在服务器就已经完成了，Java代码从数据库中读取数据，配合HTML和css，然后拿给浏览器，无需浏览器进行渲染
+
+10. 后端路由
+
+    - 后端处理URL和页面之间的关系，即后端将URL嵌套在页面中，处理好后发送给浏览器
+    - 页面请求不同的路径内容时，服务器渲染好页面并返回给客户端；
+    - 这种情况下渲染好的页面无需单独加载JS和CSS，可直接交给浏览器展示。利于SEO优化
+    - 缺点：
+        - 整个页面需后端来编写维护
+        - 前端人员若要开发页面则需PHP和JAVA等来编写
+        - 通常情况下HTML和数据以及逻辑混合在一起，不易编写和维护
+
+11. 前端渲染：浏览器中显示的网页内容大部分由前端写的JS代码在浏览器中执行渲染生成
 
 ##### 第2节: 安装和使用路由
 
@@ -1261,8 +1433,9 @@ const vm = new Vue({
     
 
 3. 路由重定向：默认显示的页面
-    - 只需配置路径:{path:'/',redirect:'/home'}
-
+    
+- 只需配置路径:{path:'/',redirect:'/home'}
+    
 4. 更改路径模式:
 
     - 默认情况下路径为哈希模式,即路径带“#”号 ，即mode模式默认为哈希
@@ -1294,6 +1467,8 @@ const vm = new Vue({
         <router-view></router-view>
         ```
 
+        
+        
         ```javascript
         methods:{
           toHome() {
@@ -1301,7 +1476,7 @@ const vm = new Vue({
           }
         }
         ```
-
+        
         
 
 ##### 第3节:路由懒加载
@@ -1388,8 +1563,9 @@ const vm = new Vue({
     - 标题是通过“title”标签实现的，但一个SPA中只有一个固定的HTML，切换页面时title因此不会改变，但可通过JS修改
 
 3. 普通方式修改标题
-    - 修改标题的位置是每一个路由对应的vue文件,可通过“mounted”生命周期函数执行对应代码修改，但页面较多时不易维护，因为需要在多个页面执行类似的代码
-
+    
+- 修改标题的位置是每一个路由对应的vue文件,可通过“mounted”生命周期函数执行对应代码修改，但页面较多时不易维护，因为需要在多个页面执行类似的代码
+    
 4. 使用导航守卫修改标题
 
     - vue-router提供了beforeEach(前置钩子)和afterEach(后置钩子)钩子函数,它们会在路由即将改变前和改变后触发
@@ -1413,8 +1589,9 @@ const vm = new Vue({
         -   注:使用前置钩子函数必须主动调用next方法,使用后置钩子函数则无需写
 
 5. 其他守卫:
-    - 除全局守卫外,还有路由独享守卫及组件内的守卫等,具体看官网 
-
+    
+- 除全局守卫外,还有路由独享守卫及组件内的守卫等,具体看官网 
+    
 6. 从一个路由跳转到另一个路由后再跳转回来,记录其未跳之前的状态 
 
     - 使用“beforeRouterLeave”钩子和“path”
@@ -1463,9 +1640,6 @@ const vm = new Vue({
         ```
 
         
-
-    
-
 
 
 ------
@@ -1522,7 +1696,7 @@ const vm = new Vue({
     -   如: add(state,getters){} 即只接收state属性和它本身getters
 
     - 
-        
+      
         ```javascript
         state: {
         	num: 1
@@ -1578,7 +1752,7 @@ const vm = new Vue({
         
         
     - 
-        
+      
         ```javascript
         data() {
           return {
