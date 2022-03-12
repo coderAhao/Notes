@@ -1,0 +1,467 @@
+<pre>
+第一章:认识jQuery
+第1节:原生JS和jQuery的区别：
+  1.原生JS和jQuery入口函数的加载模式不同
+	  原生JS会等到DOM元素和图片元素加载完毕才会执行 即“window.onload=fun(){}”
+	  jQuery只会等到DOM元素加载完毕就执行,不会等到图片元素也加载完才执行
+  2.原生JS如果编写了多个入口函数,后面的函数会覆盖前面的
+	  jQuery如果编写了多个入口函数,后面的函数不会覆盖前面的
+  3.JQuery入口函数写法：
+	  1.$(document).ready(function(){})
+	  2.jQuery(document).ready(function(){})
+	  3.$(function(){})
+	  4.jQuery(function){}
+    5.$().ready(function(){})
+	  推荐第三种写法
+
+第2节:jQuery的优势
+  1.JS自身弊端:
+    复杂的DOM、浏览器不兼容、缺乏便捷的开发调试工具
+  2.jQuery优势:
+    轻量级: 压缩后大小只有30KB
+    强大的选择器: C1-C3的选择器以及独创的高级复杂选择器
+    出色的DOM操作的封装: 封装了大量常用的DOM操作
+    可靠地事件处理机制
+    完善的Ajax:将所有的Ajax操作封装到了一个函数“$.ajax()”里
+    不污染顶级变量: 只建立了一个jQuery对象
+    兼容各种浏览器
+    链式操作方式: 无需重复获取对象
+    隐式迭代: 使用方法为操作对象的集合,而非单独对象,无需遍历循环每个返回的元素
+    结构层和行为层分离: 选中元素可为其添加事件
+    支持插件、文档完善、开源
+
+第3节:DOM对象与jQuery对象
+  1.DOM对象:
+    通过JS方法“document.getElementById”或“document.getElementsByTagName”获得的元素节点为DOM对象
+  2.jQuery对象:
+    通过jQuery包装DOM对象后产生的对象 如: var $a=$('#idname')
+	jQuery对象是个伪数组 (伪数组:具有数组length属性和下标索引属性的对象)
+  3.DOM对象与jQuery对象互换:
+    jQuery转DOM: (因为jquery获取的都是对象的集合,取其某一下标对象赋值给常规JS对象即可)
+    <script>
+	    var $a=$('#aa') //jquery对象
+	    var a=$a[0]; //DOM对象 方法1
+	    var a=$a.get(0) //DOM对象 方法2
+     </script> 
+    DOM转jQuery: 只需用“$()”把DOM对象包装起来即可
+    <script>
+	    var a=document.getElementsByTagName('aa') //DOM对象
+	    var $a=$(a) //jquery对象
+    </script> 
+  注：DOM对象不可使用jQuery定义的方法,jQuery对象也不可使用原生JS方法
+
+第4节:解决jQuery库与其他库冲突问题
+  当引入多个script文件时,文件若包含“$”就会和jQuery引起冲突
+  1.在其他库后导入,可在任何时候使用“jQuery.noConflict()”函数移交“$”控制权,“$”符号就由“jQuery”代替 (只写这一句无需其他操作)
+  2.自定义访问符号:var aa=jQuery.noConflict(),此时“aa”就代替了“$”符号
+  3.使用移交函数移交控制权后,在jQuery(function($){ })内部使用“$”
+    或在(function($){ }) 匿名函数内部使用
+
+第5节:jQuery核心函数
+  “$()”就代表核心函数,括号内写要接收的代码
+  1.接收一个函数
+  2.接收一个字符串、字符串选择器(比如id,类等,返回一个jQuery对象,对象中保存了创建的DOM元素)、字符串代码片段(返回一个jQuery对象,对象中保存了创建的DOM元素)
+  3.接收一个DOM元素(会被包装成一个jQuery对象返回)
+
+
+
+第二章:选择器
+第1节:基本选择器
+  1.id $('#idname')
+  2.class $('.classname')
+  3.element(元素标签) $('element')
+  4.通配符 $('*')
+  5.并集 $('#id,classname...')
+
+第2节:层次选择器
+  1.$('parent child') 后代
+  2.$('parent>child') 子代
+  3.$('E+F') 选择紧跟E后的F  
+  4.$('E~F') 选择E后面的所有F
+  5.$('E').next('F') 代替方法3
+  6.$('E').nextAll('F') 代替方法4
+  7.$('E').siblings('F') 选择E前面和后面的所有同级F
+
+第3节:过滤选择器(又叫伪类选择器 同CSS都以“:”开头)
+  1.基本过滤选择器 (索引值index均从0开始)
+    (E 可选):not(id/class...) 除某个元素之外的所有元素
+    :not(id/class...) 除某个元素之外的所有元素
+    E:first 选择第一个E元素 
+    E:last  
+    E:odd 选择索引值为奇数的E元素
+	E:even
+	E:eq(index) 选择给定索引值的E元素
+	E:lt(index) 选择所有索引小于index的E元素
+	E:gt(index)
+	:header 选择h1~h6的标题元素
+	:focus 选择当前具有焦点的元素
+	:root
+	:animated 选择所有正在执行动画效果的元素
+
+  2.内容过滤选择器
+	E:contains(text) 选择包含指定文本的E元素
+	E:has(F) 选择子元素有F元素的E元素
+	:empty
+	:parent 与empty相反,选择所有含有文本或子元素的元素
+
+  3.可见性过滤选择器
+	E:hidden
+	E:visible
+
+  4.属性过滤选择器
+	E[att]
+	E[att=val]
+	E[att!=val]
+	E[att^=val] 属性以val开头
+	E[att$=val] 属性以val结尾
+	E[att*=val] 属性含有val
+	E[att1][att2]
+
+  5.子元素过滤选择器
+	E:first-child 
+	E:last-child 
+	E:nth-child(n) n可为odd、even、表达式等 (注:元素索引从1开始,即n不可为0) 
+	E:only-child
+
+  6.表单对象属性过滤选择器
+	:enabled 选择所有可用的input元素
+	:disabled
+	:selected 选择所有被选中的option元素
+	:checked 选择所有被选中的表单元素 一般用于radio和checkbox
+
+第4节:表单选择器
+  :input 选择所有input元素
+  :button 选择所有type=button的input元素
+  :submit
+  :reset
+  :text
+  :textarea
+  :password
+  :radio
+  :checkbox
+  :image
+  :hidden
+  :file
+
+第5节:选择器注意事项
+  选择器中含有特殊字符“.” “(” “#” “]”等需用“\\”转义 如:$('#id#b')应为$('#id\\#b')
+
+
+
+第三章:DOM操作
+DOM(Document Object Model):与浏览器、平台、语言无关的接口,使用该接口可获取页面中的标准组件
+DOM操作分为3个方面,即DOM Core、HTML-DOM和CSS-DOM
+  DOM Core:如JS中的getElementById()、setAttribute()等方法
+  HTML-DOM:如document.forms    element.src等
+  CSS-DOM:获取和设置style对象的各种属性 如:element.style.color=''
+
+第1节:过滤方法
+  1.$(selector).first() 返回被选元素的首个元素
+  2.$(selector).last() 返回被选元素的尾个元素
+  3.$(selector).eq(index) 返回指定索引的元素,索引从0开始
+  4.$(selector).filter(value) 自定义筛选范围方法,返回被匹配的元素 (相当于进一步筛选)
+    如:$(selector).filter('.name1') 返回属性类名含有“name1”的被选元素 
+  5.$(selector).not(value) 返回不匹配标准的所有元素
+  6.$(selector).is(value) 判断所选元素是否符合value 返回值true/false 
+    如:$(selector).is('.name1') 判断所选元素是否含有类name1
+  7.$(selector).has(value) 对所选元素中有符合条件的元素进行操作
+    如:$(selector).has('p').css('width','10px') 
+  8.$(selector).slice(start,[end]) 对所选元素从指定位置进行操作(前闭区间后开区间,end可选默认到结尾 负值则代表倒数)
+
+  注:由于$选择器选择的是一个元素的集合,所以可能会在多个元素中插入内容
+
+第2节:创建及添加节点 
+  1.$(html) 设置节点 如:$("<li class=""></li>>")
+  2.$(selector).append(content) 在被选元素的内部结尾插入指定内容
+  3.$(selector).append(function(index,html){})
+  4.$(content).appendTo(selector) 将内容插入到指定的元素内部末尾中 
+    注:与append的区别在于一个是在指定元素中插入内容,一个是将内容插入到指定元素中
+  5.$(selector).prepend(content) 在被选元素内部的开头插入指定内容
+  6.$(content).prependTo(selector) 
+  注:以上插入时内容是作为被选元素的子节点插入到其原有子节点中
+  7.$(selector).before(content) 在被选元素的开头插入指定内容
+  8.$(selector).insertBefore(content) 
+  9.$(selector).after(content) 
+  10.$(selector).insertAfter(content) 
+  注:以上插入时内容作为被选元素的同级元素插入到其中
+    content可为新建的节点或内容,也可为已有的节点或内容 若将已有的插入到指定的元素中,则原已有的就会被移除
+
+第3节:删除节点:
+  1.$(selector).remove() 删除匹配元素自身及其后代节点 绑定的事件和附加的数据也会被删除
+    该方法返回值是一个指向已被删除的节点的引用,因此可以在后续继续使用此被删除的元素
+    如:删除时将其赋值给一个变量,后续可引用此变量即在引用被删除的元素
+    $(selector).remove('li[title=苹果]') 也可为其传递参数有选择性的删除元素
+  2.$(selector).detach() 删除匹配元素自身及其后代节点 绑定的事件和附加的数据不被删除
+	此方法也可如remove方法在后续中被再次引用
+  3.$(selector).empty() 仅删除匹配元素的后代节点 绑定的事件和附加的数据不被删除
+	严格来讲实际是清空元素的后代节点
+
+第4节:复制及替换节点
+  1.$(selector).clone(boolean) 复制匹配元素 
+    boolean可选默认为false 当为true时会将元素的事件也一起复制
+  2.$(selector).replaceWith(value) 用value替换被选元素(value可为函数)
+  3.$(value).replaceAll(selector) 用value替换被选元素
+    区别:被替换元素书写位置不同且replaceWith()可接收函数作为替换参数
+  替换后被替换的元素会连同绑定的事件一起消失,即新元素需重新绑定事件
+
+第5节:包裹节点
+  1.$(selector).wrap(value) 将每个被选元素放置在指定的HTML内容或元素中
+    即在每个外部都单独嵌套一个父容器value
+  2.$(selector).wrapAll(value) 所有元素放置在一个指定的HTML内容或元素中 
+    即用一个共同的父容器value将所有的匹配元素包裹起来
+    如果被包裹的元素中有其他元素则其他元素会被放到包裹元素之后
+  3.$(selector).unwrap() 将被选元素的父元素移除 
+  4.$(selector).wrapInner(value) 将每个被选元素的子内容(包含被选元素的文本)用value包裹起来 
+    value可为函数,内部返回一个结构即可
+  注:value若为原有,原有不会被移除  
+
+第6节:属性操作
+  1.$(selector).css(attribute) 获取被选元素的属性值
+  2.$(selector).attr(attribute) 获取被选元素的属性值 
+    和CSS获取到的区别:获取到的值不带单位且若元素未设置属性(如宽高未设置为默认值)则获取为“undefined”
+  3.$(selector).attr(attribute,value) 设置被选元素的属性和值 
+    若设置多个可在attr中写一个对象,属性和值均需带引号
+  4.$(selector).attr(attribute,function(index,value){}) 设置被选元素下标的属性和值 
+    被选元素为一个集合,index为其下标,value为属性值,函数内部需将value给return出去
+  5.$(selector).removeAttr(attribute) 移除被选元素的属性
+  6.$(selector).prop(attribute) 获取被选集合元素的第一个元素的属性
+  7.$(selector).removeProp(attribute) 移除被选集合元素的属性 
+
+注:很多方法都是一个函数实现获取(传递一个参数)或设置元素属性(传递两个参数)
+如:html()、text()、height()、width()、val()、css()等
+
+第7节:样式操作
+  1.$(selector).attr('class','className') 设置样式 但此种方法再次设置时后者className会覆盖前者
+  2.$(selector).addClass() 追加样式 追加时后者不会覆盖前者,可多次添加
+    一次添加多个addClass("p1 p2 p3") 空格分隔类名
+  3.$(selector).removeClass() 移除样式 一次移除多个时的方法同添加 无参则移除全部样式
+  4.$(selector).toggle(fun1,fun2,...funN) 依次执行函数
+    toggle()的另一个作用:切换元素的可见状态
+  5.$(selector).toggleClass(className) 切换类 (即若不存在指定类名则给其加上,否则移除此类)
+  6.$(selector).toggleClass(className,function(index,currentClass){},switch)   
+    函数和switch为可选参数 选取的是一个集合,index为集合元素的索引,currentClass为被选元素当前类名
+    函数内返回值为当前索引的类名(此时不是进行元素切换而是根据传入的元素的索引与类名进行函数的相关操作)
+    switch为布尔值,仅仅进行添加(true)或删除(false)类
+  7.$(selector).hasClass(className) 返回值true/false 
+    其实在jQuery内部调用了is方法 等同于$(selector).is(className)
+
+  注:$(selector)["removeClass"]('className')等价于$(selector).removeClass('className')
+  即“[]”内可放操作名 用途:可在“[]”内进行三元操作
+
+
+第8节:文档内容的获取和设置
+  1.text() 获取和设置某个元素的文本内容 (注:JS中innerText方法Firefox不支持)
+  2.html() ...HTML内容
+  3.val() ...表单元素的值
+    defaultValue 表单元素的属性,搭建结构时设置的属性值
+    对于下拉列表、单、复选框,$(selector).val(valueName) 可使匹配的valueName的元素被选中
+      $(selector).val([valueName1,valueName2]) 多个被选中
+
+第9节:遍历节点
+[value]表示可选
+  1.查找父元素:
+  $(selector).parent([value]) 获得所有匹配元素的父元素(可通过value进一步筛选父元素) 
+  $(selector).parents([value]) 获得所有匹配元素的祖先元素(即父、爷、根元素) 
+  $(selector).parentsUntil(value) 获得所有匹配元素的祖先元素,当其某个祖先元素符合value时便终止不再向上查找 
+  $(selector).closest() 从匹配元素开始获取其第一个祖先元素
+  $(selector).offsetParent() 获取匹配元素的最近的“position”为“ab/re”的父元素
+
+  2.查找子元素:
+  $(selector).children([value]) 获得所有匹配元素的子元素(即只获得selector的下一级元素)
+  $(selector).find(value) 获得所有匹配元素的value元素(包括子、孙级)
+  $(selector).contents() 获得所有匹配元素的子元素(不常用)
+
+  3.向前查找:
+  $(selector).prev() 获得匹配元素的紧邻的前一个同级元素
+  $(selector).prevAll([value]) 获得匹配元素前面的所有同级元素(value可选,进一步筛选符合value的)
+  $(selector).prevUntil(value) 获得匹配元素前面的所有同级元素,直到符合value的元素停止查找(不包含value)
+
+  4.向后查找:
+  $(selector).next() 获得匹配元素的紧邻的下一个同级元素
+  $(selector).nextAll([value]) 
+  $(selector).nextUntil(value) 
+
+  5.同级查找:
+  $(selector).siblings([value]) 获得匹配元素的所有同级兄弟元素(value可选,进一步筛选符合value的)
+    注意:当执行到此操作时,操作对象已经变为了兄弟元素,后续操作是针对兄弟元素,使用end()才能返回到被选元素
+
+  6.遍历:
+  $(selector).each(function(){}) 遍历所选元素 
+  $(selector).each(function(index){}) 遍历所选元素,利用被遍历的元素索引进行其他操作 
+  each方法:原生JS中的forEach方法只可遍历数组不可遍历伪数组 jQuery中的each方法可以遍历数组和伪数组
+
+  7.其他:
+  $(selector).add(value) 对selector操作时将value也带上进行同样操作 add()方法其实就是“和”
+  $(selector).addBack() 不常用,含义及用法百度 
+  $(selector).end() 结束链中的最近一次操作,返回到被选元素开始后续操作  
+  $(selector).map(function(){}) 把匹配集合中的每个元素都传递给函数,返回值为封装好的数组
+    要得到返回值数组可使用Jquery中的get()方法
+
+第10节:CSS-DOM操作
+  1.获取设置元素的宽高
+  $(selector).width() 获取元素宽度(传参则为设置) 宽度不包括内外边距和边框 
+  $(selector).innerWidth() 宽度包括内边距 
+  $(selector).outerWidth() 宽度包括内边距和边框 
+  $(selector).outerWidth(true) 宽度包括内、外边距边框 (默认为false,即不包括外边距) 
+  height同样用法
+
+  2.获取设置元素距离文档的位置(即元素在当前视窗的偏移)
+  $(selector).offset() 获取元素距离文档左上角的left和top值
+  $(selector).offset().top 获取元素距离文档左上角top值
+  $(selector).offset().left 获取元素距离文档左上角left值
+  $(selector).offset({top:xx,left:xx,}) 设置元素距离文档左上角的值
+  $(selector).offset(function(index,oldoffset){}) 
+    index为可选参数 oldoffset为原位置信息对象,可提取oldoffset.left或oldoffset.top 
+
+  3.$(selector).position()获取元素相对于已经定位的最近的父元素的位置,若父辈均未定位则为相对于文档的位置
+  注:只可获取不可设置
+
+  4.$(selector).scrollTop() 获取或设置元素相对于垂直滚动条顶部的距离
+  $(selector).scrollLeft() 获取或设置元素相对于垂直滚动条左部的距离
+
+
+
+第四章:事件
+第1节:鼠标事件
+  $(selector).click() 单击触发事件
+  $(selector).dbclick() 双击触发事件 
+  $(selector).mousedown()/mouseup() 按下和松开
+  $(selector).mouseover()/mouseout() 移入和移出
+    移入所选元素时触发事件,当未移出所选元素范围而移入其子后代时再次触发事件)
+  $(selector).mouseenter()/mouseleave() 移入和移出
+    移入所选元素时触发事件,当未脱离所选元素再移入其子后代时不会再次触发事件
+  $(selector).hover(function(){},funcyion(){}) 移入和移出时触发的事件(相当于将enter/leave合二为一)
+  $(selector).mousemove() 鼠标移动时触发事件
+    在整个文档中可写为$(document).mousemove()捕捉到鼠标
+
+第2节:键盘事件
+  $(document).keydown() 键盘或按钮按下时触发事件 (键盘任一按键均可触发)
+  $(document).keyup()
+  $(document).keypress() (除功能键如“F1-F12,CTRL、Shift、Alt等”外,其余按键均可触发)
+    触发顺序:keydown-keypress-keyup
+  event.keyCode返回keydown、keyup的键码 注:event可简写为e
+  event.charCode返回keypress的字符编码 (目前测试时无效)
+  event.which 效果等同keyCode,封装好的推荐使用
+
+第3节:表单事件
+  $(selector).blur()
+  $(selector).focus()
+  $(selector).focusin() 父元素为被选元素,当其子元素获取焦点时也可触发事件
+  $(selector).focusout() 
+  $(selector).change() 仅适用于文本域和select元素
+  $(selector).select() 适用于单/多行文本框 
+  $(selector).submit() 
+
+第4节:其他事件
+  $(selector).scroll() 滚动条滚动时触发事件
+  $(selector).resize() 浏览器窗口改变时触发事件
+
+使用事件对象的方式:$(selector).click(fun(event){}) 
+只需为函数传入一个参数即可(在函数内部即可使用事件对象属性)
+
+第5节:事件对象属性
+  event.type
+  event.target
+  event.currentTarget
+  event.relatedTarget 返回鼠标移动时进入或退出的那个元素
+  event.pageX/Y 返回鼠标相对于文件左侧/顶部边缘的位置
+  event.screenX/Y 显示器屏幕位置 
+  event.clientX/Y 页面视口位置(即除去上方) 
+  event.data 事件调用时的额外数据
+    如:$('input').click(2,function(e){console.log(e.data)})
+  event.timeStamp 返回当前事件触发时的时间值(即1970年1月1日至此的毫秒数)
+  event.result 返回当前事件最后触发的那个函数的处理结果
+    如:$('#btn1').click(function(){return true}) $('#btn1').click(function(e){console.log(e.result)})
+
+  event.preventDefault() 阻止事件默认行为
+  event.isDefaultPrevented() 返回event对象是否调用了阻止默认行为事件 true/false
+  event.stopPropagation() 阻止事件冒泡
+  event.isPropagationStopped() 返回event对象是否调用了阻止事件冒泡 true/false
+  event.stopImmediatePropagation() 阻止同一个对象剩余的事件处理函数并防止冒泡(即事件对象有多个处理函数,但只执行此函数其余的不执行,并且此对象不冒泡)
+  event.isImmediatePropagationStopped()
+
+小知识:事件函数内返回false会同时阻止事件对象的默认和冒泡行为(即将“event.preventDefault()/stopPropagation()”改为“return false”)
+并非所有浏览器都支持捕获,jQuery也不支持事件捕获,要想使用需用原生JS
+
+
+第6节:事件处理
+  $(selector).on(type,[selector],[data],fn(){}) on方法绑定事件
+    如:on(click,fun(){}) 绑定多个事件写为对象on({click:fun1(){},mouseout:fun2(){}})
+  $(selector).bind(type,[data],fn(){})
+    type:要绑定的事件类型,如“blur、focus、change、鼠标及键盘等事件”
+    data:可选参数,传递给事件对象的数据,可通过event.data获取到
+    fn(){}:要进行处理的函数
+    此种绑定不推荐.因为可简写为“.blur/focus/mouseover(function(){})”等
+    $(selector).bind('click',fun1).bind('mouseout',fun2)... 可连续绑定
+    $(selector).bind("mouseover mouseout...",fun(){}) 一次性绑定多个事件(注:前提为多个事件的方法相同)
+  $(selector).one('click',fun1).one('mouseout',fun2)... 事件只绑定一次就立即解绑
+  $(selector).off() 解绑事件 无参则解绑所有事件
+    解绑某个事件 如:off('click mouseout')
+    当click绑定了多个事件,只解绑某一个时 off('click',fun1)
+  $(selector).unbind([type],[data]) 
+    无参则解绑所有事件,有参数1则只解绑此类型的事件,有参数2则只解绑此参数(参数2可为函数名则解绑此函数)
+
+第7节:模拟操作
+  比如一个“click”事件需单击才可以运行,但想实现用户进入页面时就自动触发一次此事件
+  $(selector).trigger(type/funName) 触发特定类型事件或自定义事件
+  $(selector).trigger(type,[data]) 为要处理的函数传递实参,参数需写为数组形式
+    如:$('#btn').click(fun(event,data1,data2){}) $('#btn').trigger('click',[data1,data2])
+
+  trigger()方法触发事件后还会执行浏览器默认操作,如:$('input').trigger('focus')
+    不仅会为input触发绑定的focus事件还会使input得到焦点
+  $(selector).triggerHandle(type) 只触发事件而不执行浏览器默认操作
+
+
+第8节:添加命名空间便于管理
+  如:
+    $(selector1).bind("click.name",fun(){})
+    $(selector2).bind("dbclick.name",fun(){})
+    $(selector).unbind(".name") 可一次解绑多个相同命名空间的事件
+
+  $(selector).trigger("type!") 只触发未添加命名空间的type事件
+
+
+第五章:动画
+第1节:显示隐藏动画
+  $(selector).show([speed],[easing],[fun(){}]) 显示被选元素
+    三个可选参数,speed可为“slow/normal/fast”或以毫秒数表示 slow(600) normal(400) fast(200)
+    easing可为“swing(默认 缓动)/linear”
+  $(selector).hide([speed],[easing],[fun(){}]) 隐藏被选元素
+  $(selector).toggle([speed],[callback],[switch]) 切换被选元素
+  show()和hide()方法本质是将“display”设置为“none”再还原原本的display属性
+
+第2节:缓入缓出
+  $(selector).slideUp([speed],[easing],[fun(){}]) 通过调整高度来滑动显示被选元素
+  $(selector).slideDown([speed],[easing],[fun(){}]) 通过调整高度来滑动隐藏被选元素
+  $(selector).slideToggle([speed],[easing],[fun(){}]) 
+
+第3节:淡入淡出
+  $(selector).fadeIn([speed],[easing],[fun(){}]) 
+    被选元素淡入(即仅仅更改了元素的透明度,但最终元素display属性都变为了none)
+  $(selector).fadeOut([speed],[easing],[fun(){}]) 被选元素淡出 
+  $(selector).fadeToggle([speed],[easing],[fun(){}]) 切换 
+  $(selector).fadeTo(speed,opacity,[easing],[fun(){}]) 将被选元素透明度调到指定值
+    注:当进行此操作后再进行淡入时,被选元素的透明度不为1而为此时的opacity 且speed必写否则无效 
+
+第4节:自定义动画
+  $(selector).animate(params,[speed],[easing],[fun(){}]) 自定义动画
+    params为一个对象,通过改变被选元素的某些属性来实现自定义动画 如:“'width':'300px'”
+    注:属性必须为驼峰式如“font-size”改为“fontSize” 由于jquery源码缺陷,所有颜色不可写为内置单词式如“red”
+    另累积偏移写为:“'left':'+=50px'” 若写为“left:50px”则是一次偏移
+
+第5节:队列动画
+  $(selector).animate().animate()... 队列动画,即让被选元素依次动画
+  $(selector).stop([stopAll],[goToEnd]) 停止当前正在运行的动画
+    stopAll:true/false 是否停止(即清空)被选元素的所有队列动画 
+    goToEnd:true/false 当前动画是否直接结束(注:使用goToEnd时必须有stopAll参数)
+    stop()方法后再跟其他动画即是结束当前动画开始下一个
+  $(selector).finish() 被选元素结束动画直接跳转到队列最后一个动画的结束状态
+  $(selector).delay(time).animate() delay后的动画延迟规定时间后再运行
+  $(':animated') 选中正在执行的动画
+    if($(element).is(":animated")) 判断元素是否处于动画状态
+  jQuery.fx.off() 关闭页面上所有的动画
+  jQuery.fx.interval=number 设置动画的帧速率,默认值为13(值越小速度越快)
+
+注:非动画方法会插队,如“.css("color":"red")”会立即执行,因此要把非动画方法写到函数中
+
+</pre>

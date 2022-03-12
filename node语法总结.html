@@ -1,0 +1,244 @@
+<pre>
+第一章:Node基础
+第1节:概述
+  1.Node是一个基于Chrome V8引擎的JavaScript代码运行环境
+  2.Node由JS开发,一些基础语法同JS
+  3.Node.js由ECMAScript和Node模块API组成 ECMAScript语法都能在node中使用
+  4.模拟环境运行文件:“node fileName”
+    小技巧:文件名只写前几个字再按tab会自动补全
+    注:需在当前文件夹下执行node命令
+  5.浏览器全局对象为window,而Node全局对象为global
+  6.node全局对象方法可在任何地方使用:
+    类似window可省略,global也可省略
+    console.log()、setTimeout()、clearTimeout()、setInterval()、clearInterval()
+
+第2节:模块化
+  1.Node规定一个JS文件就是一个模块,内部定义的变量和函数默认情况下外部无法获得
+  2.模块内部可用“exports”方法导出成员对象,“require”方法导入模块
+  3.模块的另一种导出方式:“module.exports” 当与“exports”方法导出冲突时已“module.exports”为准
+
+第二章:系统模块fs: f(file) s(system) 文件操作系统
+  用法:首先导入fs const fs = require('fs'); 
+  1.文件读取: fs.readFile('fileName/filePath',['文件编码'],callback(err,doc))
+    回调函数callback作用:获取文件读取结果
+    例:
+    <script>
+      const fs = require('fs');
+      fs.readFile('./x.js','utf8',(err,doc) => {
+        console.log(err); //如果文件读取错误,形参err为一个错误对象,包含错误信息 否则err为null
+        console.log(doc); // doc为文件读取的结果
+      })
+    </script>
+  2.文件写入: fs.writeFile('fileName/filePath','要写入的内容',callback(err))
+    如果文件存在则直接写入否则创建文件再写入 err不为null则代表写入失败
+    注:此种写入会将原文件里的内容覆盖掉
+    例:
+    <script>
+      const fs = require('fs');
+      fs.writeFile('./test.txt','写入的内容',err => {
+        if (err != null) {
+          console.log('写入失败');
+          return;
+        }
+        else{console.log('写入成功')}
+      })
+    </script>
+
+第三章:路径操作
+第1节:引入路径
+  const path = require('path')
+
+第2节:拼接路径
+  1.window系统下路径分隔符“/”“\”均可 Linux系统下只能为“/”
+  2.语法: let str = path.join('a','b','c')
+    str: 'a\b\c'
+
+第3节:相对/绝对路径
+  1.大多数情况下都使用绝对路径,因为相对路径有时候相对的是命令行的当前工作目录
+  2.在读取文件或设置文件路径时都会选择绝对路径
+  3.使用“__dirname”获取当前文件所在绝对路径 注:是两个“_”
+
+
+第四章:第三方模块
+1.别人写好的、具有特定功能的我们能拿来使用的模块即第三方模块
+  由于第三方模块通常由多个文件组成且放在一个文件夹中,故又叫包
+2.存在形式:
+  以js文件形式存在,提供实现项目具体功能的API接口
+  以命令行工具形式存在,辅助项目开发
+
+
+Gulp功能:
+  1.合并压缩HTML、CSS、JS文件
+  2.语法转换(less、es6)
+  3.抽离公共文件
+  4.修改文件浏览器自动刷新
+
+
+package.json作用:
+  1. 项目描述文件,记录了当前项目的信息、当前项目依赖了哪些第三方模块等 
+     使用“npm init”生成 若跳过询问信息则使用“npm init -y”(y即yes)
+  2.scripts里存储命令的别名
+    运行时只需“npm run 别名”即可
+  3.node_modules文件夹里内容太多,传输不方便 别人只需有“package.json”文件然后“npm init”即可生成node包
+  4.使用“npm i”会将开发依赖和项目依赖都下载
+    使用“npm i --production”只会下载开发依赖
+  5.添加后缀“--save -dev”会将包添加到“package.json”中的“devDependencies” 即开发依赖
+    不添加“--save -dev” 则会在“dependencies”中存储的包是项目依赖
+
+package-lock.json作用:
+  记录了模块之间的依赖关系
+  1.锁定包的版本,确保下次下载不会因包版本不同报错
+  2.加快下载速度,因为该文件中已记录了项目所依赖第三方包的树状结构和下载地址,重新安装时只需下载无需其他工作
+
+
+
+Node.js模块加载机制:
+模块查找规则：
+  模块有路径无后缀时:
+  1.require方法根据模块路径查找模块,如果是完整路径,即不省略后缀名,则直接引入
+  2.如果省略后缀则先找同名JS文件再找同名文件夹
+  3.如果找到了同名文件夹则找其中的index.js文件
+  4.如果文件夹中无index.js文件则在此文件夹中的package.json文件中找“main”选项中的入口文件
+  5.如果不存在指定的入口文件或找不到则报错
+
+  模块无路径无后缀只有包名时:
+  1.Node.js会假设它是系统模块,直接去node_modules文件夹中查找带有该名字的js文件
+  2.若无js文件则查找同名文件夹,查找文件夹里的index文件
+  3.若无index文件则查找此文件夹里的“package.json”文件,查找“main”选项对应的入口文件
+  4.再找不到入口文件则报错
+
+
+服务器端:
+
+一台电脑既可当客户端也可当服务端
+  本机域名：localhost (输入它代表通过网络的方式找到自己电脑当中的服务器)
+  本地IP：127.0.0.1
+开发人员使用自己电脑可模拟两端:
+  客户端:浏览器
+  服务器端:Node环境
+
+创建web服务步骤:
+1.引用系统模块: const http = require('http')
+2.创建web服务器: const app = http.createServer()
+3.客户端发送请求时: 
+  app.on('request',(req,res) => {res.end('<h1>hellow</h1>')})
+  形参req为require,res为response
+4.监听端口: app.listen(3000)
+console.log('服务已启动,监听3000端口,请访问此端口')
+
+在3客户端发送请求时的箭头函数中req有如下几个方法:
+  1. req.method 获取报文请求方式
+  2. req.url 获取报文请求地址
+  3. req.headers 获取请求报文
+    req.headers['键值'] 获取请求报文某一项信息
+
+响应报文；
+  内容类型：
+    text/plain
+    text/html
+    text/css
+    application/javascript
+    image/jpeg
+    application/json
+
+
+如同req,res的几个方法；
+res.writeHead(statuCode,{})
+可写2个参数,及响应的状态码及处理对象
+如:
+  res.writeHead(200,{'content-type':'text/html;charset=utf-8'})
+  res.end('<h2>在页面上输出end方法内的信息</h2>')
+  即返回状态码200并将res.end中的内容以html的方式解析并以utf-8的编码方式输出到页面上
+
+
+
+Node系统模块:
+  fs 文件处理模块
+  path 路径处理模块
+  http 服务器模块
+  url 处理请求模块  
+  querystring 处理http请求提交的参数(如登录名、密码等 注意:它不是处理url路径,而是处理提交时的参数)
+
+url下的方法:
+  url.parse(urlstr,[true]) 将urlstr地址解析为对象形式 
+    如：urlstr为“?name=xiao&age=18” 解析为对象形式为 query:{name:xiao,age:18}
+    解析后query方法中拿到了对象 要想取得具体值可以链式操作如 let a=url.parse(urlstr,true).query.name
+
+
+
+
+
+处理post请求:
+1.引入querystring模块以便后续处理
+  querystring.parse()  将参数解析为对象
+2.处理post请求需使用data事件和end事件
+  例:app.on('request',(req,res) => {
+    let emptydata = '';
+
+    监听参数传输
+    req.on('data',str => {
+      emptydata+=str
+    })
+
+    监听参数传输完毕
+    req.on('end',() => {
+      let newstr = querystring.parse(emptydata)
+      console.log(newstr)
+    })
+  })
+
+
+
+静态资源:服务器不需处理,可以直接响应给客户端的资源,如HTML、css、image、js
+动态资源:相同的请求地址不同的响应资源,
+
+
+同步API:即代码依次执行,同步API可从返回值中拿到API执行结果
+异步API:代码遇到定时等操作时不会等待而是跳过执行下面的代码,故异步不能从返回值中拿到API执行结果 但可用回调函数拿到结果
+
+
+
+异步函数: 异步编程语法的终极方案,它可将异步代码写成同步的形式,使代码不再有回调函数嵌套
+async关键字
+1.普通函数定义前夹async关键字使其变为异步函数
+2.异步函数默认返回promise对象
+3.在异步函数内部使用return关键字进行结果返回,结果被包裹在promise对象中 return关键字代替了resolve方法
+4.异步函数内部使用throw关键字抛出异常
+5.调用异步函数再链式调用then方法获取异步函数执行结果
+6.调用异步函数再链式调用catch方法获取异步函数执行的错误信息
+
+await关键字:
+1.await关键字只能出现在异步函数中,写在全局会报错
+2.await后面只能写promise对象,不可写其他类型的API
+3.await关键字作用是暂停异步函数向下执行,知道promise返回结果
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+mongoDB数据库:
+
+数据库相关概念:
+一个数据库软件中可以包含多个数据仓库,在每个数据仓库中可以包含多个数据集合,每个数据集合可以包含多条文档(具体的数据)
+database(数据库):mongoDB中可建立多个数据库
+collection(集合):一组数据的集合(可理解为JS中的数组)
+document(文档):一条具体的数据(可理解为JS中的对象)
+field(字段):文档中属性的名称(可理解为JS中的对象属性)
+
+
+
+
+
+
+</pre>
+

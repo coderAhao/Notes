@@ -988,7 +988,6 @@
    -   table定义表格 
    - tr:行 
    - td:单元格
-   - 
    
 2. table对象集合：
 
@@ -1233,18 +1232,19 @@
 2. 事件:复制、粘贴
 
    -   oncopy 用户复制时触发此事件 
-     -    inputname.oncopy=fun(){ ... return false} 函数中“return false”则会禁止复制
-
-   -   onpaste 粘贴
-
-   -   oncut 剪切
-
-   -   oncontextmenu 整个文档 函数中“return false”则会禁止右键查看源代码
-
-   -   例:
-
-       
-
+   
+-    inputname.oncopy=fun(){ ... return false} 函数中“return false”则会禁止复制
+     
+-   onpaste 粘贴
+   
+-   oncut 剪切
+   
+-   oncontextmenu 整个文档 函数中“return false”则会禁止右键查看源代码
+   
+-   例:
+   
+    
+   
      ```javascript
      <form action="#" name="form1">
      
@@ -1263,7 +1263,7 @@
         }
      </script>
      ```
-     
+    
      
 
 ##### 第7节:注意事项
