@@ -1,0 +1,141 @@
+<pre>
+原生小程序语法
+第一章：基础语法
+条件渲染:
+<view wx:if="{{true}}">显示 相当于vue中的v-if</view>
+<view hidden>隐藏 相当于vue中的v-show</view>
+
+获取输入框的值：
+通过事件源对象e来获取，打印出e 数据为e.detail.value
+
+在方法中获取data中的数据不可直接“this.num”需“this.data.num”
+
+input绑定事件：“bindinput="handleInput"”
+
+绑定点击事件：“bindtap="handleClick" data-operation="{{num}}"”
+不可直接传参，需额外自定义一个属性才能传num,但num也不能直接得到，需定义一个常量去接收
+如：handleClick(e) {
+	const n = e.currentTarget.dataset.operation;
+	num: this.data.num + n
+}
+绑定自定义事件：bind加事件名，如 binditemClick，其实和vue相同只是没有语法糖而已
+
+
+样式导入：
+使用“@import”语句导入且只支持相对路径
+
+小程序支持的选择器较少，有如下几个:
+class、id、单个标签、并集标签、nth-child(n)、::after、::before
+
+使用less：
+安装插件“easy less”然后在vscode设置中配置“"less.compile": {"outExt": ".wxss"}”
+然后在需要的地方编写less文件保存时会生成“.wxss”的文件
+
+数据双向绑定：
+与vue不同，vue可写为 this.num = e.detail.value
+但小程序需写为“this.setData({num: e.detail.value})”
+
+
+常见组件标签：
+view：代替div标签 新增了hover-class属性：点击时的效果
+text：相当于span,文本标签;只能嵌套text；只有它能长按文字进行复制(需加“user-select”属性)；可对空格换行等进行编解码(需加“decode”属性)
+如：<text decode>&nbsp;</text> 会被解析为空格
+
+图片标签写为“image”而不是“img”
+图床：聚合图床、路过图床
+
+navigator导航组件：
+target:self/miniProgram(别的小程序id)
+url: 当前小程序内的跳转链接
+open-type: 跳转方式
+open-type有效值:
+	navigate保留当前页面，跳转到应用内除tabbar外的某个页面
+	redirect关闭当前页面，跳转到应用内除tabbar外的某个页面
+	switchTab跳转到tabbar页面并关闭其他所有非tabbar页面
+	reLaunch关闭所有页面，跳转到页面内任意页面
+	navigateBack关闭当前页面，返回上一页面或多级页面
+	exit退出小程序，当target="miniProgram"
+
+button开发能力：
+open-type属性值：
+	contact 直接打开客服对话功能，需在微信小程序后台配置(只能通过真机调试打开)
+	share 转发当前的小程序到微信朋友中但不能转发到朋友圈
+	getPhoneNumber 获取当前用户的手机号码信息，通过“bindgetphonenumber="getPhone"”绑定一个事件，在事件的回调函数中通过参数来获取(获取到的数据为已加密的需在后台解析)
+	getUserInfo 获取当前用户个人信息,使用方法类似获取手机号但获取的信息为未加密的
+	openSetting 打开小程序内置授权页面(授权页面中只会出现用户曾经点击过的权限)
+	feedback 打开小程序内置的意见反馈页面
+	launchApp 在小程序中直接打开app 需在app中通过链接打开小程序，在小程序中通过这个功能重新打开app
+
+
+父子传值：
+父向子：同vue只是把props改为properties
+子向父：同vue只是把this.$emit改为了this.triggerEvent
+
+
+
+
+
+
+
+uni-app语法
+第一章:
+uni-app特点：基于vue开发前端应用的框架，一套代码可发布到IOS、Android、H5及各种小程序(微信、支付宝、百度、头条、QQ、钉钉)
+
+微信开发者工具用来预览打包好的小程序
+初次在Hbuild X中使用微信小程序运行需在微信开发者工具中将“设置-安全设置-服务端口”打开
+
+项目目录及文件作用：
+manifest.json是程序配置文件,用于指定程序的名称、图标、权限等
+pages.json用来存放文件路径以及窗口外观、原生导航栏以及底部原生tabBar等
+
+
+为实现多端兼容、考虑综合编译速度、运行性能等因素uni规定了开发规范:
+	1.单页面文件遵循vue规范
+	2.组件标签靠近小程序规范 如组件最外标签为“view”
+	3.接口靠近小程序,如将前缀“wx”改为“uni”
+	4.数据绑定同vue
+	5.为兼容多端运行,建议使用flex布局
+
+rpx:小程序的单位，即响应式px,可根据屏幕宽度自适应的动态单位,750rpx恰好为屏幕宽
+
+使用“@import”导入外联样式表,使用相对路径,并以“;”结尾
+支持常用的id、class等选择器但不支持“*”选择器
+小程序中的page标签相当于body节点
+定义在App.vue中的样式为全局样式,在单个的vue文件中的样式为局部样式且局部样式会覆盖全局
+全局的颜色之类的变量可在“uni-scss”中设置
+uni-app支持使用字体图标,但有以下几点需要注意:
+	字体小于40kb会自动转为base64格式,大于40kb需自己转换否则不生效
+	字体文件引用路径推荐以“~@”开头的绝对路径,即手动给其加上“~@”，即在下载好的字体图标“iconfont.css”文件中，更改五个文件的引入路径
+	如：@font-face{
+		font-family: test-icon;
+		src:url('~@/static/fonts/iconfont.ttf')
+	}
+
+声明式跳转：利用组件进行跳转
+编程式：利用api
+1.利用“navigator”跳转 （声明式）
+<navigator url="/pages/message/message" open-type="switchTab">跳转</navigator>
+跳到“tabbar”页面“navigator”需加“open-type='switch-tab'”
+跳到其他页面只需写url即可
+“open-type='redirect'”关闭当前页面并跳转到所去页面（不写“redirect”组件跳转后在其左上方有返回上一个页面的箭头，写了之后则没有）
+
+2.编程式
+给一个DOM添加一个点击事件，利用uni接口进行跳转
+如：<button @click="goIndex">按钮</button>
+goIndex() {
+	uni.switchTab({
+		url: 'pages/index/index'
+	})
+}
+
+路由传参：
+<navigator url="/pages/message/message?id=80&name=zhang" open-type="switchTab">跳转</navigator>
+message页面通过钩子“onLoad”接收本页面传递的参数
+onLoad(options) {
+	console.log(options) //{id:80,name:zhang}
+}
+
+
+
+
+</pre>
