@@ -988,7 +988,6 @@
    -   table定义表格 
    - tr:行 
    - td:单元格
-   - 
    
 2. table对象集合：
 
@@ -1233,18 +1232,19 @@
 2. 事件:复制、粘贴
 
    -   oncopy 用户复制时触发此事件 
-     -    inputname.oncopy=fun(){ ... return false} 函数中“return false”则会禁止复制
-
-   -   onpaste 粘贴
-
-   -   oncut 剪切
-
-   -   oncontextmenu 整个文档 函数中“return false”则会禁止右键查看源代码
-
-   -   例:
-
-       
-
+   
+-    inputname.oncopy=fun(){ ... return false} 函数中“return false”则会禁止复制
+     
+-   onpaste 粘贴
+   
+-   oncut 剪切
+   
+-   oncontextmenu 整个文档 函数中“return false”则会禁止右键查看源代码
+   
+-   例:
+   
+    
+   
      ```javascript
      <form action="#" name="form1">
      
@@ -1263,7 +1263,7 @@
         }
      </script>
      ```
-     
+    
      
 
 ##### 第7节:注意事项
@@ -1294,7 +1294,7 @@
 
 2. 布局方向:“flex-direction:column(列)/row(行)”
 
-   -   水平方向:父元素添加justcify-content:flex-start(子元素左对齐)/flex-end(右)/(center居中)/space-between(两边贴近两端,中间的均分空白区域,空白留在各个元素之间;注：子元素此时不加“flex:1”)/space-around(空白留在各个元素两边,相当于给每个盒子添加了margin)
+   -   水平方向:父元素添加justify-content:flex-start(子元素左对齐)/flex-end(右)/(center居中)/space-between(两边贴近两端,中间的均分空白区域,空白留在各个元素之间;注：子元素此时不加“flex:1”)/space-around(空白留在各个元素两边,相当于给每个盒子添加了margin)
 
    -   垂直方向:父元素添加align-items:flex-start(上对齐)/flex-end(底)/center(居中)/stretch(在子元素不给高度的前提下,子元素高度继承父元素)
 

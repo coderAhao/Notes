@@ -123,11 +123,9 @@
 5. 超链接标记`<a>`:
 
    -  href(hyperText reference):url(链接到的地址) 
-
-   -  暂时未确定链接目标,将url改为"#"表示空链接点击会跳转到页面头部 ;url改为"javascript:;"则不进行任何跳转
-
+-  暂时未确定链接目标,将url改为"#"表示空链接点击会跳转到页面头部 ;url改为"javascript:;"则不进行任何跳转
    -  target:_self(在当前窗口打开)  _blank(新建窗口打开) 
-
+-  download: url 点击下载url链接的内容
    -  锚点链接:可快速定位到链接内容 
 
      - ​    创建步骤：

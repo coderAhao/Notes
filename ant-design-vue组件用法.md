@@ -48,3 +48,24 @@
 ###### date-picker
 
 - v-model绑定之后 再加一个属性“valueFormat='YYYY-MM-DD'”可直接双向绑定，无需再写change事件
+
+###### upload
+
+- 上传时走自定义接口（因为有时上传可能需要同时传参）
+
+    - before-upload 绑定一个函数，函数return false 
+
+    - 在change函数中
+
+        - ```javascript
+            const params = new FormData()
+            params.append('file', file)
+            params.append('要传的形参', ‘实参)
+            return upload(params).then(res => {}).catch(() => {})
+            ```
+
+    - 若要校验文件格式，可在change函数中进行，不满足格式将其return，不让其走接口
+
+- 上传后不展示已上传的文件列表
+
+    - 给当前的upload一个refName，上传成功后将this.$refs.refName.sFileList置为空数组（有时可能是refName[0].sFileList，打印一下当前upload即可）

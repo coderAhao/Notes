@@ -4,43 +4,255 @@
 
 - 原理: 在n秒后执行该事件,如果n秒内又触发该事件则重新计时
 
-- 应用场景：登录、发短信等按钮避免用户点击太快，以致于发送了多次请求
+- 应用场景：登录、发短信、搜索框搜索联想等按钮避免用户点击太快，以致于发送了多次请求
 
-```javascript
-// 写法1: 使用箭头函数的this
-function debounce(func,wait) {
-  let timeout;
-  return function (...args) {
-    if(timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => {
-      func.apply(this,args)
-    },wait)
-  }
-}
-// 写法2: 使用普通函数的this
-function debounce(func,wait) {
-  let timeout;
-  return function () {
-    let content = this;
-    let args = arguments;
-    if(timeout) clearTimeout(timeout);
-      timeout = setTimeout(function() {
-        func.apply(content,args)
-    },wait)
-  }
-}
-function fu() {
-  // doSomeThing
-}
-const str = debounce(fu,300);
-str();
-```
+- 库：underscore、lodash(不过很久未维护了)两个库都有
 
-##### 2. 节流throttle
+- 基础结构
+
+    - ```javascript
+        let i = 0
+        function foo() {
+        	console.log(++i, this)
+        }
+        function debounce(fn, delay) {
+        	// 定义一个定时器，保存上一次的定时器
+        	let timer = null
+        	return function(...args) {
+        		// 取消上一次的定时（第一次无timer故先判断）
+        		if(timer) clearTimeout(timer)
+            timer =	setTimeout(() => {
+            	// 外部传入的要真正执行的函数
+            	// fn() 同时使用箭头函数和apply的目的是如果fn内部有执行this相关的代码，this指向可能会错误
+        			fn.apply(this, args)
+        		}, delay)
+        	}
+        }
+        const bar = debounce(foo, 2000)
+        // 按钮点击触发事件
+        function btnClick() {
+        	bar()
+        }
+        ```
+
+- 改进版
+
+    - 基础版缺点：第一次点击也会延迟执行
+
+    - 增加一个参数，外界决定点击时是否立即执行一次
+
+    - 条件判断时若仅判断immediate，当连续点击时第一次是立即执行，但接下来的每次都是立即执行，因为默认immediate为false，传过来的immediate为true，第一次执行后immediate一直为true未再初始化为false，故延迟失去效果
+
+    - 延时过程中取消函数执行(只需在回调函数内封装一个取消的方法即可)
+
+    - ```javascript
+        let i = 0
+        function foo() {
+        	console.log(++i, this)
+        }
+        function debounce(fn, delay, immediate = false) {
+        	let timer = null
+        	let isInvoke = false
+        	return function(...args) {
+        		if (timer) clearTimeout(timer)
+        		if (immediate && !isInvoke) {
+        			fn.apply(this, args)
+        			isInvoke = true
+        		} else {
+        			timer = setTimeout(() => {
+        				fn.apply(this, args)
+        				isInvoke = false
+        			}, delay)
+        		}
+        	}
+        }
+        ```
+
+- 延时过程中取消函数执行
+
+    - ```javascript
+        // 由外界决定是否立即执行
+        let i = 0
+        function foo() {
+        	console.log(++i, this)
+        }
+        function debounce(fn, delay, immediate = false) {
+        	let timer = null
+        	let isInvoke = false
+        	const _debounce =  function(...args) {
+        		if (timer) clearTimeout(timer)
+        		if (immediate && !isInvoke) {
+        			fn.apply(this, args)
+        			isInvoke = true
+        		} else {
+        			timer = setTimeout(() => {
+        				fn.apply(this, args)
+        				isInvoke = false
+        			}, delay)
+        		}
+        	}
+        	// 封装取消功能
+        	_debounce.cancelBtn = function() {
+        		if (timer) clearTimeout(timer)
+        		timer = null
+        		isInvoke = false
+        	}	
+        	return _debounce
+        }
+        const bar = debounce(foo, 2000, true)
+        // 触发事件
+        function btnClick() {
+        	bar()
+        }
+        // 取消事件
+        function cancelClick() {
+        	bar.cancelBtn()
+        }
+        ```
+
+- 如果要防抖函数有返回值
+
+    - ```javascript
+        // 如果函数有返回值则需再传入一个回调
+        let i = 0
+        function foo() {
+        	console.log(++i, this)
+        	return '防抖函数有返回值'
+        }
+        function debounce(fn, delay, immediate = false, callBack) {
+        	let timer = null
+        	let isInvoke = false
+        	const _debounce =  function(...args) {
+        		if (timer) clearTimeout(timer)
+        		if (immediate && !isInvoke) {
+        			// 拿到函数返回值
+        			const res= fn.apply(this, args)
+        			// 执行回调
+        			if (callBack && typeof callBack === 'function') callBack(res)
+        			isInvoke = true
+        		} else {
+        			timer = setTimeout(() => {
+        				const res =	fn.apply(this, args)
+        				if (callBack && typeof callBack === 'function') callBack(res)
+        				isInvoke = false
+        			}, delay)
+        		}
+        	}
+        	// 封装取消功能
+        	_debounce.cancelBtn = function() {
+        		if (timer) clearTimeout(timer)
+        		timer = null
+        		isInvoke = false
+        	}	
+        	return _debounce
+        }
+        const bar = debounce(foo, 2000, true, res => {
+        	console.log(res)
+        })
+        // 触发事件
+        function btnClick() {
+        	bar()
+        }
+        // 取消事件
+        function cancelClick() {
+        	bar.cancelBtn()
+        }
+        ```
+
+- 内部this
+
+    - ```javascript
+        // 写法1: 使用箭头函数的this
+        function debounce(func,wait) {
+          let timeout;
+          return function (...args) {
+            if(timeout) clearTimeout(timeout);
+            timeout = setTimeout(() => {
+              func.apply(this,args)
+            },wait)
+          }
+        }
+        // 写法2: 使用普通函数的this
+        function debounce(func,wait) {
+          let timeout;
+          return function () {
+            let content = this;
+            let args = arguments;
+            if(timeout) clearTimeout(timeout);
+              timeout = setTimeout(function() {
+                func.apply(content,args)
+            },wait)
+          }
+        }
+        function fu() {
+          // doSomeThing
+        }
+        const str = debounce(fu,300);
+        str();
+        ```
+
+##### 2. 节流throttle 
 
 - 原理: n秒内该事件只触发一次 
 
-- 应用场景: 滚动加载、加载更多、滚到底部监听、搜索框搜索联想
+- 应用场景: 滚动加载、加载更多、滚到底部监听
+
+- 基础结构
+
+    - ```javascript
+        let i = 0
+        function foo() {
+        	console.log(++i, this)
+        }
+        function throttle(fn, interval) {
+        	// 上次触发时间
+        	let lastTime = 0
+        	const _throttle = function() {
+        		// 本次点击触发时间
+        		const nowTime = new Date().getTime()
+        		const remainTime = interval - (nowTime - lastTime)
+        		if (remainTime <= 0) {
+        			fn()
+        			lastTime = nowTime
+        		}
+        	}
+        	return _throttle
+        }
+        const bar = throttle(foo, 2000)
+        function btnClick() {
+        	bar()
+        }
+        ```
+
+- 外界控制第一次是否立即触发
+
+    - ```javascript
+        let i = 0
+        function foo() {
+        	console.log(++i, this)
+        }
+        function throttle(fn, interval, options = {leading: false}) {
+        	let lastTime = 0
+        	const _throttle = function() {
+        		const nowTime = new Date().getTime()
+        		// !lastTime判断是否是第一次，因为只有第一次进来时lastTime才为0
+        		// !options.leading判断是否要进行立即触发
+        		if (!lastTime && !options.leading) lastTime = nowTime
+        		const remainTime = interval - (nowTime - lastTime)
+        		if (remainTime <= 0) {
+        			fn()
+        			lastTime = nowTime
+        		}
+        	}
+        	return _throttle
+        }
+        const bar = throttle(foo, 2000, {leading: false})
+        function btnClick() {
+        	bar()
+        }
+        ```
+
+        
 
 
 
@@ -168,6 +380,13 @@ function formateDate(date, fmt) {
         
 
 ##### 6. 响应式原理
+
+- 回答
+    - vue会遍历data中所有数据的属性
+    - 然后通过Object.defineProperty把这些属性全部转为getter/setter
+    - 通过getter拦截属性的获取，进行依赖的收集；通过setter拦截属性的更新，通知依赖进行回调
+    - 每个组件实例都有watcher监听对象，它会在组件渲染过程中把属性记录为依赖
+    - 当依赖项的setter被调用时，会通知watcher重新计算，因此使关联的视图进行更新
 
 - 清楚两点即可知道原理
     - vue内部是如何监听数据发生改变的 （通过数据劫持）
@@ -437,3 +656,35 @@ export { render, staticRenderFns }
         - 可访问组件实例this
 
     
+
+##### 11.深拷贝
+
+- 基础结构
+
+    - ```javascript
+        function cloneDeep(obj) {
+        	const  typeofValue = typeof obj
+          // 函数类型的话直接返回原函数就行，因为函数本身就是用来复用的
+          if (typeofValue === 'function') return obj
+          // 若是字符串之类的直接返回即可
+        	if (obj !== null && typeofValue !== 'object') return obj
+          // 判断是数组还是对象
+        	const newObj = Array.isArray(obj) ? [] : {}
+        	for (const key in obj) {
+        		newObj[key] = cloneDeep(obj[key])
+        	}
+        	return newObj
+        }
+        const obj1 = {
+        	name: 'kobe',
+        	friends: {
+        		name: 'james'
+        	},
+          arr: ['ball', 'paint']
+        }
+        const obj2 = cloneDeep(obj1)
+        obj2.friends.name = 'curry'
+        obj2.arr[0] = 'basketBall'
+        console.log(obj1) // {name: 'kobe', friends: {name: 'jsmes'}, arr: ['ball', 'paint']} 
+        console.log(obj2) // {name: 'kobe', friends: {name: 'curry'}, arr: ['basketBall', 'paint']}
+        ```

@@ -80,7 +80,29 @@ return obj.filter(obj => !res.has(obj.id) && res.set(obj.id, 1))
 // 上一行最后set设置的obj.id为1，也可为其他任意字符 
 ```
 
-###### 3.生成随机字符串
+###### 3. 数组去重
+
+- ```javascript
+    const arr = [1, 2, 1, 3, 2]
+    // 方式1
+    const newArr = []
+    for(const item of arr) {
+      if(newArr.indexOf(item) !== -1) {
+      	newArr.push(item)
+      }
+    }
+    // 方式2
+    const arrSet = new Set(arr)
+    const newArr = Array.from(arrSet)
+    // 方式3
+    const arrSet = new Set(arr)
+    const newArr = [...arrSet]
+    // 方式2和3需要将set结构变为数组结构
+    ```
+
+    
+
+###### 4. 生成随机字符串
 
 ```javascript
 const str = Math.random().toString(36).substr(2,10)

@@ -1,4 +1,4 @@
-#### 第一章：JS基础
+####  第一章：JS基础
 
 ##### 1.1 初识JavaScript
 
@@ -115,7 +115,6 @@
     -  Null:null 空型 表示一个不存在或无效的对象或地址,它已定义并初始化为null (注:通过将变量值设为null来清空变量)
     -  Undefined:undefined 变量已被声明但未被初始化(注意与Null的区别)
     -   这些类型在内存中占用固定大小空间,值保存在栈空间中,按值访问
-    -   
 - 引用数据类型(浅拷贝)
     - 对象 数组 函数 
     - 引用类型保存对象多少不固定,即在内存中空间不固定,但内存地址固定,存储在堆内存中,存储的是内存地址 变量复制时,基本类型复制的是值本身,系统会再为其分配内存空间;而引用类型复制的是地址
@@ -339,11 +338,14 @@
 - **数组**转字符串
 
     - join('-') 转时可添加任意连接符,若不添加则默认以逗号连接 用法:str.join()
-
     - toString() 用法:arr.toString()
+    
+- 字符串转为数组
 
-        
-
+  - split()
+  - 扩展运算符
+  - Array.from()
+  
 - 其他方法
 
     - arr.reverse() 数组中的元素逆序
@@ -951,23 +953,23 @@
 - 箭头函数
 
     - 箭头前为传递的参数,箭头后为函数体
-
-    - 用法
-
-        - 标准用法: `(p1,p2,...pn) => { statements }`
-
-        - `(p1,p2,...pn) => { return expression;}` 或 `(p1,p2,...pn) => expression`
+- 用法
+  
+    - 标准用法: `(p1,p2,...pn) => { statements }`
+    
+    - `(p1,p2,...pn) => { return expression;}` 或 `(p1,p2,...pn) => expression`
             - 函数体只有一条语句可省略“{}”且函数体只有一条返回值语句时可同时省略“{}”和“return”关键字
-
-        -  `(p1) => { statements }` 或 `p1 => {statements}`
+    
+    -  `(p1) => { statements }` 或 `p1 => {statements}`
             - 只有一个参数可省略“()”
-
-        -   `() => {statements}` 或 `_ => {statements}`
+    
+    -   `() => {statements}` 或 `_ => {statements}`
             - 无参时箭头前需有“()”或“_”
-
     -  箭头函数不绑定this,即this指向函数定义位置的上下文,也就是创建时的this是谁,则运行时的this就是谁
-    - 如函数中定义了箭头函数,则箭头函数中的this指向函数中的那个this对象,即this指向的是上一级作用域下的this
-
+- 如函数中定义了箭头函数,则箭头函数中的this指向函数中的那个this对象,即this指向的是上一级作用域下的this
+  
+    - 箭头函数中也无arguments，若在函数中出现则同this一样会去其上层作用域中寻找arguments
+    
 - 剩余参数
 
     - 实参大于形参个数时,形参args代表一个数组接收剩余参数(可和解构综合使用)
@@ -1130,7 +1132,139 @@
 
         
 
-##### 5.3 自定义构造函数
+##### 5.3 属性操作
+
+- 属性操作：Object.defineProperty()
+
+    - 对某个属性进行比较精准的操作控制，会直接在此对象上定义一个新属性或修改现有属性，并返回此对象
+
+    - Object.defineProperty(obj, prop, descriptor)
+
+        - obj：要定义的对象；prop：要定义或修改的属性名称；descriptor：要定义或修改的属性描述符
+
+    - 属性描述符descriptor：分为数据属性描述符和存取属性描述符
+
+    - 数据属性描述符：
+
+        - configurable
+
+            - 属性可否通过delete删除，或修改，或将其改为存取属性
+            - 直接在一个对象时定义某个属性时，默认其为true
+            - 通过属性描述符去定义时，默认其为false
+
+        - enumerable
+
+            - 属性可否通过for-in或Object.keys() 返回该属性
+            - 直接在一个对象时定义某个属性时，默认其为true
+            - 通过属性描述符去定义时，默认其为false
+
+        - writable
+
+            - 是否可以修改属性的值
+            - 直接在一个对象时定义某个属性时，默认其为true
+            - 通过属性描述符去定义时，默认其为false
+
+        - value
+
+            - 读取时返回它，修改时修改它
+            - 默认为undefined
+
+        - ```javascript
+            // 例1
+            var obj = { name: 'kobe', age: 18 }
+            delete obj.age
+            Object.defineProperty(obj, 'age', {
+            	value: 20
+            })
+            console.log(obj) // {name: 'kobe'}
+            console.log(obj.age) // 20 因为使用了属性描述符时只设置了value，则enumerable默认为false，故枚举不到属性age，但实际是存在的
+            // 例2
+            var obj = { name: 'kobe', age: 18 }
+            delete obj.age
+            Object.defineProperty(obj, 'age', {
+            	enumerable: true,
+            	value: 22
+            })
+            console.log(obj) // { name: 'kobe', age: 22 }
+            // 例3
+            var obj = { name: 'kobe', age: 18 }
+            delete obj.age
+            Object.defineProperty(obj, 'age', {
+              writable: false,
+              value: 20
+            })
+            obj.age = 22
+            console.log(obj) // { name: 'kobe', age: 20 } 通过writable其值不可更改
+            ```
+
+    - 存取属性描述符：
+
+        - configable、enumerable、writable、value用法同数据属性描述符
+
+        - 相比数据属性描述符，多了“get、set”属性，且get、set不能与writable、value共存
+
+        - 作用：隐藏某个私有属性(通过调用对象并不能得到,只能通过objName.key得到)或截获某个属性的访问和设置过程
+
+        - ```javascript
+            const obj = {
+              name: 'kobe',
+              age: 18
+            }
+            Object.defineProperty(obj, 'useAge', {
+              get: function() {
+              	return this.age + 1
+              },
+              set: function(val) {
+              	return this.age += val
+              }
+            })
+            console.log(obj.useAge) // 19
+            obj.useAge = 20
+            console.log(obj.useAge) // 39 因为18+20+1 加1是因为调用了获取的方法，这一点容易忽略
+            // 注：useAge相当于就是给obj新加了一个方法，方法内又包含了获取和设置两种方法，另useAge不可和obj内现有属性重名，否则报错
+            ```
+
+- 属性的一些方法（不常用，了解即可）
+
+    - Object.preventExtensions(obj) 禁止向对象添加新属性（注意：是禁止添加新属性，但可修改原属性）
+
+        - ```javascript
+            const obj = { name: 'kobe' }
+            Object.preventExtensions(obj)
+            obj.age = 18
+            console.log(obj) // { name: 'kobe' }
+            ```
+
+    - Object.seal(obj) 禁止对象配置/删除里面的属性
+
+        - ```javascript
+            const obj ={ name: 'kobe' }
+            Object.seal(obj)
+            delete obj.name
+            console.log(obj) // { name: 'kobe' }
+            // 还可使用遍历的方法去实现这种功能
+            for (var key in obj) {
+              Object.defineProperty(obj, key, {
+                configurable: true,
+                enumerable: true,
+                writable: true,
+                value: obj[key]
+              })
+            }
+            ```
+
+    - Object.freeze(obj) 禁止修改属性
+
+        - ```javascript
+            const obj = { name: 'kobe' }
+            Object.freeze(obj)
+            obj.name = 'curry'
+            console.log(obj) // { name: 'kobe' }
+            ```
+
+            
+
+##### 5.4 自定义构造函数的几种方式
 
 - 基本模式 
     - 缺点：
@@ -1151,11 +1285,11 @@
 
     - ```javascript
         function create(name,weapon) {
-          var per = new Object();
+          var per = new Object(); // 或 var per = {}
           per.na = name;
           per.wea = weapon;
           per.run = function () {
-          return this.na + '的武器是' + this.wea;
+            return this.na + '的武器是' + this.wea;
           }
           return per;  	// 此步看做出厂,必须有
         }
@@ -1165,25 +1299,32 @@
 
         
 
-- 构造函数
+- 构造函数模式
 
-    - 特殊的函数主要用来初始化对象,即为对象成员变量赋初值,与new一起使用，一般将对象中共用的属性和方法放抽取到这个函数中
+    - 属于特殊的函数，主要用来初始化对象,即为对象成员变量赋初值,与new一起使用，一般将对象中共用的属性和方法放抽取到这个函数中
+
+    - 构造时与普通函数无区别，但是在使用时用了new关键字去调用（使用时如果不传参可以省略小括号及其参数，如var fn = new create）
 
     - new在执行时的过程:
         - 创建空对象
+        - 对象内部的隐式原型`__proto__`会指向该构造函数的显示原型  prototype
         - 让this指向这个空对象
         - 执行构造函数中的代码给对象添加属性及方法
-        - 返回这个新对象(故构造函数中不需要再手写return)
-
+        
+    - 返回这个新对象(故构造函数中不需要再手写return)
+      
     -  构造函数成员
 
         - 实例成员:在函数内部通过“this”添加的属性或方法，只能通过实例化的对象来访问
 
-        - 静态成员:直接通过构造函数名添加的属性或方法，只能通过构造函数名来访问
+        - 静态成员:直接通过构造函数名添加的属性或方法，只能通过构造函数名来访问（如：fn.name = 'kobe'）
 
     - 缺点：函数内部创建方法时,方法为函数,每一个实例化的对象都会为其创建一个新的地址存放函数,浪费内存
 
-    - instanceof 验证实例对象与原型对象之间的关系, 用法：A instanceof B 返回值true/false
+    - instanceof 验证实例对象与原型对象之间的关系,
+
+        - 用于检测构造函数的prototype是否出现在某个实例对象的原型链上
+        - 用法：A instanceof B 返回值true/false
 
     - 
       
@@ -1239,6 +1380,7 @@
 
     - isPrototypeOf属性用来判断某个prototype对象和实例的关系 
 
+        - 即用于检测某个对象是否出现在某个实例对象的原型链上
         - 用法：create.prototype.isPrototypeOf(p1)
 
     - hasOwnProperty属性用来判断某个实例是否有自己的prototype 
@@ -1269,7 +1411,7 @@
             return this.na+'的武器是' + this.wea
             }
         }
-        //写成这样更好理解 create.prototype.run=function(){return this.na+'的武器是'+this.wea}
+        // 写成这样更好理解 create.prototype.run=function(){return this.na+'的武器是'+this.wea}
         var p1=new create('喽啰',['大刀','长矛']);
         console.log(p1.run()); 	//“喽啰的武器是大刀,长矛”
         ```
@@ -1315,7 +1457,130 @@
 
 -  工厂模式和构造函数模式每次实例化对象都会给对象创建新的地址,即函数拷贝到每一个实例中,而不是引用地址 造成资源浪费
 
-##### 5.4 继承
+##### 5.5 原型
+
+- 构造函数原型：prototype
+
+    - JS规定每个构造函数都有一个prototype属性指向另一个对象,这个对象的所有属性和方法都会被构造函数所拥有
+
+    - 故可将那些不变的方法直接定义在prototype对象上,供所有实例共享
+
+    - 原型:就是一个对象，也称prototype为原型对象
+    - 作用：共享方法
+
+- 实例对象原型:`__proto__`(前后均为两杠)
+
+    - 实例对象都会有一个属性“`__proto__`”指向构造函数的“prototype”原型对象
+
+    - prototype属于构造函数的显式原型 
+
+    - `__proto__`属于实例对象的隐式原型,二者相等,但它只是内部指向原型对象“prototype”,不可以使用它
+
+    - 对于实例对象的方法,先从实例对象查找,如果没有找到由于“`__proto__`”就会去原型对象上查找
+
+        - ```javascript
+            function Person() {}
+            Person.prototype.skill = function () {}
+            let x = new Person();
+            console.log(x.__proto__ == Person.prototype); 	// true
+            ```
+
+- constructor构造函数
+
+    - 对象原型(`__proto__`)和构造函数(prototype)原型对象里面都有一个属性constructor,称其为构造函数,因为它指回构造函数本身
+
+    - constructor主要用于记录该对象引用于哪个构造函数,它可让原型对象重新指向原来的构造函数
+
+    - 很多情况下需要手动利用constructor属性指回原来的构造函数
+
+    - ```javascript
+        function Person() {}
+        Person.prototype.sing = function () {}
+        Person.prototype.movie = function () {}
+        // 此种写法是在原型的基础上(原型有constructor属性)添加方法
+        
+        Person.prototype = {
+          constructor：Person,
+          sing() {},
+          movie() {}
+        }
+        // 此种写法为重写原型,即将原型的属性清空了再添加,故需手动添加上constructor属性
+        
+        let x = new Person();
+        ```
+
+- 利用原型对象扩展内置对象方法
+
+    - 只可使用“.”方法追加,不可使用对象的方式覆盖
+
+    - ```javascript
+        Array.prototype.sum = function () {
+          let sum = 0;
+          for (let i = 0; i < this.length; i++) {
+            sum += this[i]
+          }
+          return sum;
+        }
+        let arr1 = [1,2,3];
+        let arr2 = new Array(1,2,3);
+        console.log(arr1.sum()); 	// 6
+        console.log(arr2.sum()); 	// 6 
+        ```
+
+- 构造函数、原型对象及实例对象之间的关系
+
+    - 构造函数通过“.prototype”指向原型对象“prototype” ，通过new生成实例
+- 原型对象“prototype”通过“.constructor”指向构造函数，原型对象“prototype”等于实例对象“`__proto__`” 
+  
+    - 实例对象“`__proto__`”等于“prototype”,故也可通过“constructor”指向构造函数
+- 原型对象与实例对象的存储地址不同
+
+##### 5.6 对象、函数与原型之间的关系
+
+- 全局有两个类(也可称为构造函数)：function Object() {} 和 function Function() {}
+- var Foo = new Function与function Foo() {}是等价的,统统都是由Function创建出来的
+- Foo是个函数，它会有一个显示原型对象：Foo.prototype
+    - 因为Foo是个函数，JS引擎内部会创建个对象{constructor: Foo} constructor指向Foo
+    - 但Foo.prototype是个对象，既然是对象则会通过`__proto__`指向Object.prototype
+- Foo除了是个函数外，它本身也是个对象，它也会有个隐式原型对象：`Foo.__proto__`
+    - 因为Foo相当于是new Function()形成的(故可说它也是个对象)，故`Foo.__proto__`来自Function.prototype,即`Foo.__proto__ --> Function.prototype`
+    - 而Function.prototype是创建Function时JS引擎给的，故Function.prototype的constructor：{constructor: Function}
+    - 故Foo.prototype不等于`Foo.__proto__`
+- Function的原型对象与Foo的原型对象均是由function Object()创建出来的 
+    - function Object()本身是个对象，但它又是个函数（既然是函数，那就可看为由Function创建出来的），故其`__proto__`指向Function的原型对象
+    - 有点绕的一点：function Object()也是个函数，由Function创建，但Function又继承自function Object()的原型，二者相辅相成
+- ![](imgs/JavaScriptImg/对象-函数-原型关系-04.png)
+- <img src="imgs/JavaScriptImg/对象-函数-原型关系-05.png"  />
+
+##### 5.7 原型链
+
+- 在构造函数、原型对象及实例对象的基础上增加了Object,Object为所有构造函数的祖先
+
+- 原型对象“prototype”也有属性“`__proto__`”且指向Object的原型对象“prototype”
+
+- Object原型对象“prototype”通过“.constructor”指向Object构造函数，通过“.`__pro__`”指向null
+
+- Object构造函数又通过“.prototype”指向Object的原型对象“prototype”
+
+- JS成员查找机制
+
+    - 当访问一个对象的属性或方法时,根据作用域链，如下
+
+    - 先自身查找-->prototype原型-->Object原型对象-->直到null
+
+    - 因此在此链上只要有所需的属性或方法对象就可拿来用,但遵循就近原则 (可看作继承的原理)
+
+- 原型对象中this的指向
+
+    - 构造函数中通过this添加的属性以及构造函数的原型函数(方法)中的this均指向实例对象
+
+    - 即构造函数中的this指向它的调用者
+
+- 关系网
+
+    ![](imgs/JavaScriptImg/原型链关系网.png)
+
+##### 5.8 继承
 
 - 父类、子类
     - 父类又叫超类、基类
@@ -1355,8 +1620,11 @@
 
     - 原型链继承
 
-        - 缺点:只能继承一个父类的prototype属性,因为前者会被后者覆盖
+        - 缺点:
 
+            - 只能继承一个父类的prototype属性,因为前者会被后者覆盖
+            - 继承的属性虽然存在但打印时看不到
+    
         - ```javascript
             function monkey(){};
             monkey.prototype.ty = '猴子';
@@ -1366,39 +1634,115 @@
             magic.prototype = new monkey();  
             magic.prototype.skill = '七十二变';  // 添加新属性需在清空并赋值后添加,否则仍会被清空
             var wukong = new magic();
-            console.log (wukong.ty); // “猴子”
+        console.log (wukong.ty); // “猴子”
             console.log (wukong.skill);  // “七十二变”
             ```
-
-    - 混合继承
-
-        -  用构造函数继承父类的对象,用原型链继承父类的方法
-
-        - 借用构造函数继承父类型属性核心原理:通过call方法将父类型中的this指向子类型的this,实现子类型继承父类型的属性
         
+    - 混合继承
+      
+        ```javascript
+        // 用构造函数继承父类的对象,用原型链继承父类的方法 
+        // 借用构造函数继承父类型属性核心原理:通过call方法将父类型中的this指向子类型的this,实现子类型继承父类型的属性
+        function Parent(name,age) {
+          this.name = name;
+          this.age = age;
+        }
+        Parent.prototype.sing = function () {
+          console.log('子构造函数不能只通过call方法拿到父构造函数原型的属性及方法')
+        }
+        function Son(na,ag,score) {
+          Parent.call(this,na,ag)
+        }
+        // Son.prototype = Parent.prototype; // 不可直接赋值,因为这样为浅拷贝,修改子构造函数原型上的方法父也会改变
+        Son.prototype = new Parent(); // 原型链中实例对象可通过“.__proto__”指向原型故子对象原型可间接指向父对象原型
+        Son.prototype.constructor = Son;  // 需将Son的constructor再指回Son,因为上一步new时子原型对象中的所有内容被覆盖了 因此赋值时注意等号左边仅仅是个变量还是类似原型对象这种有隐含属性的对象
+        Son.prototype.exam =function () {
+          console.log('此时给子构造函数原型已实现继承并能追加自己独有的方法');
+        } 
+        let son = new Son("武",18,99);
+        ```
+        
+    - 原型式继承 
+    
         - ```javascript
-            function Parent(name,age) {
-              this.name = name;
-              this.age = age;
+            // 1.使用内置方法
+            var obj = {
+            	name: 'kobe'
             }
-            Parent.prototype.sing = function () {
-              console.log('子构造函数不能只通过call方法拿到父构造函数原型的属性及方法')
+            function fn1(obj) {
+            	var newObj = {}
+            	Object.setPrototypeOf(newObj, o)
+            	return newObj
             }
-            function Son(na,ag,score) {
-              Parent.call(this,na,ag)
+            var info = fn1(obj)
+            console.log(info) // {}
+            console.log(info.__proto__) // {name: 'kobe'}
+            // 2.迂回一下自己写
+            var obj = {
+            	name: 'kobe'
             }
-            // Son.prototype = Parent.prototype; // 不可直接赋值,因为这样为浅拷贝,修改子构造函数原型上的方法父也会改变
-            Son.prototype = new Parent(); // 原型链中实例对象可通过“.__proto__”指向原型故子对象原型可间接指向父对象原型
-            Son.prototype.constructor = Son;  // 需将Son的constructor再指回Son,因为上一步new时子原型对象中的所有内容被覆盖了 因此赋值时注意等号左边仅仅是个变量还是类似原型对象这种有隐含属性的对象
-            Son.prototype.exam =function () {
-              console.log('此时给子构造函数原型已实现继承并能追加自己独有的方法');
-            } 
-            let son = new Son("武",18,99);
+            function fn2(obj) {
+            	function fn() {}
+            	fn.prototype = obj
+            	var newObj = new fn() 
+            	return newObj
+            }
+            var info = fn2(obj)
+            console.log(info) // {}
+            console.log(info.__proto__) // {name: 'kobe'}
+            // 3.最新语法 直接用Object.create
+            var obj = {name: 'kobe'}
+            var info = Object.create(obj)
+            console.log(info.__proto__) // {name: 'kobe'}
             ```
-            
+    
+    - 寄生式继承
+    
+        - ```JavaScript
+            // 本质是原型式继承混合工厂模式
+            var person = {
+            	running: function() {
+            		console.log('running')
+            	}
+            }
+            function fn1(name, age) {
+            	var newObj = Object.cteate(person)
+            	newObj.name = name
+            	newObj.age = age
+            	newObj.studying = function() {
+            		console.log('studying')
+            	}
+            	return newObj
+            }
+            var person1 = fn1('person1', 'age1')
+            var person2 = fn1('person2', 'age2')
+            ```
+    
+    - 寄生组合式继承
+    
+        - ```javascript
+            function createObj(obj) {
+            	function fn() {}
+            	fn.prototype = obj
+            	return new fn()
+            }
+            function inheritPrototype(son, father) {
+            	son.prototype = createObj(father.prototype)
+            	Object.defineProperty(son.prototype, 'constructor', {
+            		enumerable: false,
+            		configurable: true,
+            		writable: true,
+            		value: son
+            	})
+            }
+            function fn1() {}
+            function fn2() {}
+            // 调用时只需 inheritPrototype(fn1, fn2) 就可让fn1继承自fn2
+            ```
+    
             
 
-##### 5.5 内置对象
+##### 5.9 内置对象
 
 - String对象
 
@@ -1437,7 +1781,7 @@
 
 - Number对象
   
-- `num.toFixed(n)` 四舍五入保留小数点后n位 (无参数则保留正整数) 
+  - `num.toFixed(n)` 四舍五入保留小数点后n位 (无参数则保留正整数) 
   
 - Math对象
 
@@ -1540,21 +1884,8 @@
 
         - `datename.setMilliseconds()` 设置当前时间的毫秒 (0-999) (注意"s"小写)
     
-- Object.defineProperty()
 
-    - Object.defineProperty(objName,key,description) 定义新属性或修改原属性
-
-    - description写为对象“{}” 里面有四个属性值 
-
-        - “value:” 设置属性“key”的值
-
-        - “writable:true/false” 属性key的值是否可重写,默认false
-
-        - “enumerable:true/false” 属性key能否被枚举(即遍历),默认false
-
-        - “configurable:true/false” 属性key是否可被删除或属性里的特性(指的是writable等而非key的属性值)能否被再次修改,默认false
-
-##### 5.6 字符串与数字转换
+##### 5.10 字符串与数字转换
 
 - `new String()`  通过new关键字创建字符串对象
 
@@ -1677,58 +2008,57 @@
     - history对象
 
         - `history.length`  查看浏览器历史记录访问过页面的个数
-
         - `history.back()` 第一次跳转到此页面的那个url(即相对本页面的上个url),此时返回到上个url 
-
-        - `history.forward()` 此页面第一次跳转到另一个(即下一个)url,此时会再次跳转到那个url 
-
+                - `history.forward()` 此页面第一次跳转到另一个(即下一个)url,此时会再次跳转到那个url 
         - `history.go(number)`  number为正,跳到它的下几页否则为上几页
-
-    - Location(地址栏)对象
-
-        - 属性
-
-            - location.href='xxx'或loaction.href 设置或返回完整的url
-
-            - location.host  设置或返回主机名和当前url的端口号
-
-            - location.hostname 设置或返回当前url的主机名
-
-            - location.port  设置或返回当前url服务器的端口号
+                - `history.pushState(url)` 打开指定的地址
+        - `history.replaceState(url)` 使用replace的方式打开新地址
+    
+- Location(地址栏)对象
+  
+    - 属性
+    
+        - location.href='xxx'或loaction.href 设置或返回完整的url
+    
+        - location.host  设置或返回主机名和当前url的端口号
+    
+        - location.hostname 设置或返回当前url的主机名
+    
+        - location.port  设置或返回当前url服务器的端口号
             - ......
-
-        - 方法
-
-            - location.assign('url')    加载新的文档
-
-            - location.reload(true/false)  重新加载当前文档
-
-                - 无参数/false 检查文档是否已变,若变则重新下载否则从缓存中加载文档
-
-                - true 无论文档最后更改日期是何时,均会绕过缓存重新下载
-
-            -  location.replace() 以新文档替换当前文档,在history中不生成新的历史记录,而是将当前记录替换掉
-
-    - Screen对象
-
-        - screen.availWidth/Height 返回显示屏宽高(不包含windows任务栏)
-
-        - screen.Width/Height 返回显示屏宽高(包含windows任务栏)
-
-        - screenLeft/Top 返回相对于屏幕窗口的X/Y坐标 (Firefox不支持)
-
-        - screenX/Y 返回相对于屏幕窗口的X/Y坐标 (IE8不支持)
+    
+    - 方法
+    
+        - location.assign('url')    加载新的文档
+    
+        - location.reload(true/false)  重新加载当前文档
+    
+            - 无参数/false 检查文档是否已变,若变则重新下载否则从缓存中加载文档
+    
+            - true 无论文档最后更改日期是何时,均会绕过缓存重新下载
+    
+        -  location.replace() 以新文档替换当前文档,在history中不生成新的历史记录,而是将当前记录替换掉
+    
+- Screen对象
+  
+    - screen.availWidth/Height 返回显示屏宽高(不包含windows任务栏)
+    
+    - screen.Width/Height 返回显示屏宽高(包含windows任务栏)
+    
+    - screenLeft/Top 返回相对于屏幕窗口的X/Y坐标 (Firefox不支持)
+    
+    - screenX/Y 返回相对于屏幕窗口的X/Y坐标 (IE8不支持)
         - .......
-
-    - Navigator(浏览器)对象属性
-
-        - navigator.appCodeName 返回浏览器代码名
-
-        - navigator.appVersion 返回浏览器平台及版本信息
-
-        - navigator.appMinorVersion 返回浏览器次级版本
-
-        - navigator.platform 返回运行浏览器的操作平台
+    
+- Navigator(浏览器)对象属性
+  
+    - navigator.appCodeName 返回浏览器代码名
+    
+    - navigator.appVersion 返回浏览器平台及版本信息
+    
+    - navigator.appMinorVersion 返回浏览器次级版本
+    
+    - navigator.platform 返回运行浏览器的操作平台
         - ......
 
 ##### 6.3 DOM
@@ -2235,36 +2565,32 @@ myAjax.onreadystatechange = function() {
 - json
 
     - json语法是JS对象表示法的语法的子集
-
-    - json实际是个字符串(注:在json中不可写注释,因为它本身就是字符串,即使是注释也会读取)
-
+- json实际是个字符串(注:在json中不可写注释,因为它本身就是字符串,即使是注释也会读取)
     - 语法规则
-        - 数据在键值对中 
+    - 数据在键值对中 
         - 由逗号分隔 
         - 花括号保存对象 
         - 方括号保存数组
-
     - json值：number(整数或浮点数)/strings(键值对均在双引号中)/boolean/Array/object/null
-
     - json解析器
 
         - 只会识别文本并不执行
 
         - 语法:`var ob=JSON.parse(myjson,参数2)`
-            - 参数2为匿名函数可选 
+        - 参数2为匿名函数可选 
             - 匿名函数需有两个形参,执行时会将json的键和值传入
-
-    - 序列化
-
+- 序列化
+  
         - 与解析相反,将几组对象转换为json数据(即字符串)
-
-        - 语法:`var ob=JSON.stringify(myjson,参数2,参数3)`
-
-            - 参数2可选,用法同上,若不选可写为“null”
-
-            - 也可设置为要过滤的键值,如“['name','age']”会将其他的键值筛选出去再序列化
-
-            - 参数3可选,即如何排版,可写为“数字或字符”，如(“4”或“\*\*”)即在每个键值对的前面加上4个空格或2个“*”
+    
+    - 语法:`var ob=JSON.stringify(myjson,参数2,参数3)`
+    
+        - 参数2可选,用法同上,若不选可写为“null”
+    - 参数2也可设置为要过滤的键值,如“['name','age']”会将其他的键值筛选出去再序列化
+        - 参数3可选,即如何排版,可写为“数字或字符”，如(“4”或“\*\*”)即在每个键值对的前面加上4个空格或2个“*”
+    - 深拷贝
+    - 序列化可进行深拷贝
+        - 缺点：对某个对象进行深拷贝时，如果value为undefined/函数以及Symbol的话，会直接将其忽略掉
 
 -  XML
 
@@ -2275,8 +2601,11 @@ myAjax.onreadystatechange = function() {
 ##### 8.5 cookie
 
 - cookie
-    - 或称cookies
-    - 为辨别用户身份、进行会话(session)跟踪而存储在客户端的数据变量,当浏览器请求页面时浏览器会记录该用户状态,在响应头中通过“Set-Cookie”字段发送数据,浏览器保存此数据,下次再访问同一页面时,服务器先查看cookie,根据cookie资料判断来访者,进而发送内容。
+    - 或称cookies，为辨别用户身份、进行会话(session)跟踪而存储在客户端的数据变量
+    - 当浏览器请求页面时浏览器会记录该用户状态,在响应头中通过“Set-Cookie”字段发送数据,浏览器保存此数据,下次再访问同一页面时,服务器先查看cookie,根据cookie资料判断来访者,进而发送内容。
+    - 按在客户端存储位置
+        - 内存cookie：保存在内存中，无过期时间， 浏览器关闭cookie消失
+        - 硬盘cookie：保存在硬盘中，有过期时间，手动清理或时间到被清理掉
     -  目前大部分浏览器可在客户端生成和读取cookie，但Chrome不支持，需在服务端。
 
 - 创建cookie
@@ -2305,9 +2634,10 @@ myAjax.onreadystatechange = function() {
 
 - 缺点：
 
-    - 内存仅有4K,能保存数据的数量有限,大概保存20-50条信息,不同浏览器有差异
-
-    - 有些信息不适合,比如银行卡号
+    - 内存仅有4Kb,能保存数据的数量有限,大概保存20-50条信息,不同浏览器有差异
+    - cookie会附加到每一次http请求中，浪费流量
+    - 在headers中cookie信息以明文传输，有些信息不适合,比如银行卡号
+    - PC端浏览器会自动设置cookie，但IOS、Android、小程序端需要手动设置
 
 - cookie是根据域名、路径等参数存储的,不同网站的cookie相互隔离从而保证数据的安全
 
@@ -2341,125 +2671,25 @@ myAjax.onreadystatechange = function() {
         console.log(getCookie('name'))
         ```
 
+##### 8.6 storage
 
-
-
-
-
+- localStorage：本地存储，网页关掉存储内容依然存在
+- sessionStorage：会话存储，网页关掉内容被清除
+    - 在页面内跳转到新的页面(即打开一个新的tab)，新开的tab页sessionStorage中无数据
+- 属性：local和session均可使用
+    - localStorage.setItem('key', 'value')
+    - localStorage.getItem('key')
+    - localStorage.removeItem('key')
+    - localStorage.clear() 清空存储的所有key
+    - localStorage.length
+    - localStorage.key(i) 拿到索引值为i的key
 
 
 ------
 
-#### 第九章：原型
 
-##### 9.1 原型
 
-- 构造函数原型：prototype
-
-    - JS规定每个构造函数都有一个prototype属性指向另一个对象,这个对象的所有属性和方法都会被构造函数所拥有
-
-    - 故可将那些不变的方法直接定义在prototype对象上,供所有实例共享
-
-    - 原型:就是一个对象，也称prototype为原型对象
-    - 作用：共享方法
-
-- 实例对象原型:`__proto__`(前后均为两杠)
-
-    - 实例对象都会有一个属性“`__proto__`”指向构造函数的“prototype”原型对象
-    - prototype属于构造函数的显式原型 
-
-    - `__proto__`属于实例对象的隐式原型,二者相等,但它只是内部指向原型对象“prototype”,不可以使用它
-
-    - 对于实例对象的方法,先从实例对象查找,如果没有找到由于“`__proto__`”就会去原型对象上查找
-
-        - ```javascript
-            function Person() {}
-            Person.prototype.skill = function () {}
-            let x = new Person();
-            console.log(x.__proto__ == Person.prototype); 	// true
-            ```
-
-- constructor构造函数
-
-    - 对象原型(`__proto__`)和构造函数(prototype)原型对象里面都有一个属性constructor,称其为构造函数,因为它指回构造函数本身
-
-    - constructor主要用于记录该对象引用于哪个构造函数,它可让原型对象重新指向原来的构造函数
-
-    - 很多情况下需要手动利用constructor属性指回原来的构造函数
-
-    - ```javascript
-        function Person() {}
-        Person.prototype.sing = function () {}
-        Person.prototype.movie = function () {}
-        // 此种写法是在原型的基础上(原型有constructor属性)添加方法
-        
-        Person.prototype = {
-          constructor：Person,
-          sing() {},
-          movie() {}
-        }
-        // 此种写法为重写原型,即将原型的属性清空了再添加,故需手动添加上constructor属性
-        
-        let x = new Person();
-        ```
-
-- 利用原型对象扩展内置对象方法
-
-    - 只可使用“.”方法追加,不可使用对象的方式覆盖
-
-    - ```javascript
-        Array.prototype.sum = function () {
-          let sum = 0;
-          for (let i = 0; i < this.length; i++) {
-            sum += this[i]
-          }
-          return sum;
-        }
-        let arr1 = [1,2,3];
-        let arr2 = new Array(1,2,3);
-        console.log(arr1.sum()); 	// 6
-        console.log(arr2.sum()); 	// 6 
-        ```
-
-- 构造函数、原型对象及实例对象之间的关系
-
-    - 构造函数通过“.prototype”指向原型对象“prototype” ，通过new生成实例
-
-    - 原型对象“prototype”通过“.constructor”指向构造函数，原型对象“prototype”等于实例对象“`__proto__`”
-
-    - 实例对象“`__proto__`”等于“prototype”,故也可通过“constructor”指向构造函数
-
-    - 原型对象与实例对象的存储地址不同
-
-##### 9.2 原型链
-
-- 在构造函数、原型对象及实例对象的基础上增加了Object,Object为所有构造函数的祖先
-
-- 原型对象“prototype”也有属性“`__proto__`”且指向Object的原型对象“prototype”
-
-- Object原型对象“prototype”通过“.constructor”指向Object构造函数，通过“.`__pro__`”指向null
-
-- Object构造函数又通过“.prototype”指向Object的原型对象“prototype”
-
-- JS成员查找机制
-
-    - 当访问一个对象的属性或方法时,根据作用域链，如下
-
-    - 先自身查找-->prototype原型-->Object原型对象-->直到null
-
-    - 因此在此链上只要有所需的属性或方法对象就可拿来用,但遵循就近原则 (可看作继承的原理)
-
-- 原型对象中this的指向
-
-    - 构造函数中通过this添加的属性以及构造函数的原型函数(方法)中的this均指向实例对象
-
-    - 即构造函数中的this指向它的调用者
-
-- 关系网
-
-    ![](imgs/JavaScriptImg/原型链关系网.png)
-
-#### 第十章 : 事件循环机制
+#### 第九章 : 事件循环机制
 
 ##### 10.1 宏任务
 
