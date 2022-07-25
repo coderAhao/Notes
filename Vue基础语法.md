@@ -883,7 +883,7 @@ const vm = new Vue({
 
 ##### 第1节: 基础
 
-1. 安装工具
+1. 安装工具  
 
     - 安装好node后,命令行输入“npm i nrm -g https://registry.npm.taobao.org”安装nrm (node自带软件包管理工具npm) 
 
@@ -896,15 +896,12 @@ const vm = new Vue({
 2. 下载包
 
     - 下载指定版本“npm i webpack@3.6.0 -g” @紧跟版本名 -g为全局安装(即在本机上以后无需安装)
-
-    - 局部安装“npm i webpack@3.6.0 --save-dev” 
-
-    -  --save-dev是开发时依赖,项目打包后不需继续使用 
-
-    -   --save运行时依赖
-
+- 局部安装“npm i webpack@3.6.0 --save-dev” 
+    - --save-dev是开发时依赖,项目打包后不需继续使用 
+- --save运行时依赖
     -   若下载vue,则不得带-dev 因为vue在运行时代码也依赖它
-
+-   装包时也可使用`git i git+ssh://`拼接包仓库地址
+    
 3. 其他
 
     - webpack和grunt/glup的区别

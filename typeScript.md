@@ -286,7 +286,8 @@
         }
         // ts中函数第一个形参的位置注明this指向
         function Person(this: Window, name: string) {
-          this.myName = name
+          	// ts中 需指明this指向，在函数第一个形参位置注明
+            this.myName = name
         }
         window.Person('kobe') // 注此处的window代表全局
         ```

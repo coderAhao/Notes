@@ -1,4 +1,4 @@
-##### 第一章
+#####    第一章
 
 ###### 1.特性
 
@@ -34,3 +34,22 @@ fs.writeFile('./test.js', 'let a = 2', (err, data) => {
 })
 ```
 
+###### 4.使用进程对象process
+
+- 在node中，可直接使用“process.env”拿到进程对象
+
+- 如：定义一个test.js文件，在此文件中打印出package.json文件中的某个值
+
+  - 先在test.js文件中拿到此属性，即通过`process.env.npm_package`找到了package文件，然后通过“_”属性拿到属性
+  - 在package.json文件中配置脚本，如`"start": "node ./test.js"`
+  - 最后命令行执行脚本`npm start`  而不是在命令行执行`node test.js`
+
+- ![](D:\文件\学习资料\语法整理Markdown格式\imgs\nodeImg\process_demo01_01.png)
+
+  ![](D:\文件\学习资料\语法整理Markdown格式\imgs\nodeImg\process_demo01_02.png)
+
+###### 5.打包补充
+
+- 直接在脚本中配置命令区分打包时的生产与开发环境，应该也是可以的(cross-env是跨平台用的，不用管它，不写就行，后面的gulp也直接忽略就行)
+
+- ![](D:\文件\学习资料\语法整理Markdown格式\imgs\nodeImg\package_way_01.png)
